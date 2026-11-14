@@ -1,0 +1,8 @@
+# Runtime
+fastapi==0.162.5
+uvicorn[standard]==0.54.0
+httpx==0.28.1
+# Testing
+pytest==9.2.0
+pytest-asyncio==1.4.1.post1
+pytest-cov==7.1.0
