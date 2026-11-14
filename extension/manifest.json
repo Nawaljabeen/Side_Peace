@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "SidePeace",
+  "version": "0.1.0",
+  "description": "Ask side questions about your Gemini chat without polluting its context.",
+  "permissions": ["sidePanel", "storage"],
+  "host_permissions": ["https://gemini.google.com/*", "http://localhost:8000/*"],
+  "background": {
+    "service_worker": "background/service_worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://gemini.google.com/*"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "side_panel": {
+    "default_path": "sidepanel/sidepanel.html"
+  },
+  "action": {
+    "default_title": "Open SidePeace"
+  }
+}
