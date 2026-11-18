@@ -6,14 +6,20 @@ import pytest
 
 from database.base import AbstractStorageAdapter
 from database.memory_adapter import InMemoryAdapter
+from database.sqlite_adapter import SQLiteAdapter
 from services.models import Turn
 
 
-@pytest.fixture(params=["memory"])
-def adapter(request) -> AbstractStorageAdapter:
+@pytest.fixture(params=["memory", "sqlite"])
+def adapter(request, tmp_path):
     if request.param == "memory":
-        return InMemoryAdapter()
-    raise ValueError(request.param)
+        yield InMemoryAdapter()
+    elif request.param == "sqlite":
+        SQLiteAdapter.reset_instance()
+        yield SQLiteAdapter.get_instance(str(tmp_path / "contract.db"))
+        SQLiteAdapter.reset_instance()
+    else:
+        raise ValueError(request.param)
 
 
 def make_turn(index: int, text: str = "hello", role: str = "user") -> Turn:
