@@ -5,11 +5,15 @@ I/O runs in a worker thread (asyncio.to_thread) so the event loop is never block
 Writes from concurrent callers must be serialised by the WriteQueue (see docs/thread-safety.md).
 """
 import asyncio
+import logging
 import sqlite3
 from pathlib import Path
 
 from database.base import AbstractStorageAdapter
+from errors import StorageError
 from services.models import Turn
+
+logger = logging.getLogger("sidepeace")
 
 DEFAULT_DB_PATH = "sidepeace.db"
 SCHEMA_PATH = Path(__file__).with_name("schema.sql")
@@ -22,15 +26,26 @@ class SQLiteAdapter(AbstractStorageAdapter):
         self._db_path = db_path
         # isolation_level=None: we issue BEGIN/COMMIT ourselves. check_same_thread=False:
         # the connection is used from asyncio.to_thread workers (one at a time, via the queue).
-        self._conn = sqlite3.connect(db_path, check_same_thread=False, isolation_level=None, timeout=5.0)
-        self._conn.execute("PRAGMA journal_mode=WAL")
-        self._conn.execute("PRAGMA foreign_keys=ON")
-        self._conn.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+        try:
+            self._conn = sqlite3.connect(db_path, check_same_thread=False, isolation_level=None, timeout=5.0)
+        except sqlite3.Error as exc:
+            logger.error("cannot open database: %s", exc)
+            raise StorageError("cannot open the database") from exc
+        try:
+            self._conn.execute("PRAGMA journal_mode=WAL")
+            self._conn.execute("PRAGMA foreign_keys=ON")
+            self._conn.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+        except sqlite3.Error as exc:
+            self._conn.close()
+            logger.error("cannot initialise database: %s", exc)
+            raise StorageError("cannot open the database") from exc
 
     @classmethod
     def get_instance(cls, db_path: str | None = None) -> "SQLiteAdapter":
         if cls._instance is None:
             cls._instance = cls(db_path or DEFAULT_DB_PATH)
+        elif db_path is not None and db_path != cls._instance._db_path:
+            raise StorageError("the storage adapter is already open on a different database file")
         return cls._instance
 
     @classmethod
@@ -44,10 +59,18 @@ class SQLiteAdapter(AbstractStorageAdapter):
         self._conn.close()
 
     async def get_turns(self, session_id: str) -> list[Turn]:
-        return await asyncio.to_thread(self._get_turns_sync, session_id)
+        return await self._run(self._get_turns_sync, session_id)
 
     async def add_turn(self, session_id: str, turn: Turn) -> int:
-        return await asyncio.to_thread(self._add_turn_sync, session_id, turn)
+        return await self._run(self._add_turn_sync, session_id, turn)
+
+    async def _run(self, func, *args):
+        """Run a blocking SQLite call in a worker thread; translate sqlite3 errors."""
+        try:
+            return await asyncio.to_thread(func, *args)
+        except sqlite3.Error as exc:
+            logger.error("storage operation failed: %s", exc)
+            raise StorageError("storage operation failed") from exc
 
     def _get_turns_sync(self, session_id: str) -> list[Turn]:
         rows = self._conn.execute(
