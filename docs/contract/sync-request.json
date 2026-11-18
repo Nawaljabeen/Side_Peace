@@ -1,0 +1,8 @@
+{
+  "session_id": "gemini-7f3a9c",
+  "turn": {
+    "index": 0,
+    "role": "user",
+    "text": "How do I reverse a linked list in Python?"
+  }
+}

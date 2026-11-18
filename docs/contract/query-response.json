@@ -1,0 +1,3 @@
+{
+  "answer": "yield turns a function into a generator: it hands back one value at a time and pauses until the next value is requested."
+}
