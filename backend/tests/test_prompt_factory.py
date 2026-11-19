@@ -17,3 +17,19 @@ def test_empty_context_still_produces_a_prompt_with_the_question():
     prompt = PromptFactory.build_sidekick_prompt([], "What is a mutex?")
     assert "What is a mutex?" in prompt
     assert "no previous conversation" in prompt.lower()
+
+
+@pytest.mark.parametrize("question", ["", "   "])
+def test_blank_question_is_rejected(question):
+    with pytest.raises(ValueError):
+        PromptFactory.build_sidekick_prompt([], question)
+
+
+def test_question_longer_than_limit_is_rejected():
+    with pytest.raises(ValueError):
+        PromptFactory.build_sidekick_prompt([], "x" * (MAX_QUESTION_LENGTH + 1))
+
+
+def test_question_exactly_at_limit_is_accepted():
+    prompt = PromptFactory.build_sidekick_prompt([], "x" * MAX_QUESTION_LENGTH)
+    assert "x" * MAX_QUESTION_LENGTH in prompt
