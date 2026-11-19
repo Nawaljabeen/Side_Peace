@@ -84,3 +84,15 @@ describe("SidePanelController output safety (REQ-F04)", () => {
     expect(elements.messageArea.querySelector("b")).toBeNull();
   });
 });
+
+describe("SidePanelController failure handling (REQ-F04, REQ-Q02)", () => {
+  it("shows a friendly message when the bridge rejects and does not throw", async () => {
+    bridge.sendQuery.mockRejectedValue(new TypeError("Failed to fetch"));
+    const controller = new SidePanelController(bridge, elements);
+    elements.input.value = "hello";
+    await expect(controller.handleUserSubmit()).resolves.toBeUndefined();
+    expect(elements.messageArea.textContent).toMatch(/could not reach/i);
+    expect(elements.messageArea.textContent).not.toMatch(/failed to fetch/i);
+    expect(elements.submitButton.disabled).toBe(false);
+  });
+});
