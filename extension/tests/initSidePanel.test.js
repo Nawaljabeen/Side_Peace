@@ -34,3 +34,32 @@ describe("initSidePanel form wiring (REQ-F04)", () => {
     expect(document.getElementById("answer").textContent).toBe("an answer");
   });
 });
+
+describe("initSidePanel server status (REQ-F04, REQ-Q02)", () => {
+  beforeEach(renderPage);
+  const bridge = { sendQuery: vi.fn() };
+
+  it("shows 'connected' when the backend is healthy", async () => {
+    const { ready } = initSidePanel({ document, bridge, backendUrl: "http://x", fetchFn: okHealth() });
+    await ready;
+    const status = document.getElementById("server-status");
+    expect(status.textContent).toBe("Server: connected");
+    expect(status.dataset.state).toBe("up");
+  });
+
+  it("shows 'not running' when the backend cannot be reached", async () => {
+    const fetchFn = vi.fn().mockRejectedValue(new TypeError("Failed to fetch"));
+    const { ready } = initSidePanel({ document, bridge, backendUrl: "http://x", fetchFn });
+    await ready;
+    const status = document.getElementById("server-status");
+    expect(status.textContent).toMatch(/not running/i);
+    expect(status.dataset.state).toBe("down");
+  });
+
+  it("asks the configured backend url for /health", async () => {
+    const fetchFn = okHealth();
+    const { ready } = initSidePanel({ document, bridge, backendUrl: "http://localhost:8000", fetchFn });
+    await ready;
+    expect(fetchFn).toHaveBeenCalledWith("http://localhost:8000/health");
+  });
+});
