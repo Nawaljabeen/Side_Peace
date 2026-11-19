@@ -22,6 +22,7 @@ export class SidePanelController {
     }
     const requestId = ++this.latestRequestId;
     this.messageArea.textContent = "";
+    this.answerArea.textContent = "";
     this.submitButton.disabled = true;
     try {
       const answer = await this.bridge.sendQuery(text);
