@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from api.error_handlers import register_error_handlers
 from api.health import router as health_router
+from api.query import router as query_router
 from api.sync import router as sync_router
 from database.base import AbstractStorageAdapter
 from database.session_manager import Pruner, SessionManager
@@ -23,4 +24,5 @@ def create_app(
     register_error_handlers(app)
     app.include_router(health_router)
     app.include_router(sync_router)
+    app.include_router(query_router)
     return app
