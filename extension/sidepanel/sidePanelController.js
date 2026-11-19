@@ -14,6 +14,7 @@ export class SidePanelController {
     const text = this.input.value.trim();
     const requestId = ++this.latestRequestId; // any submit invalidates a reply that is still in flight
     this.answerArea.textContent = "";
+    this.submitButton.disabled = false; // nothing is in flight any more; a valid text disables it again below
     if (!text) {
       this.renderError("Please type a question.");
       return;
