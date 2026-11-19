@@ -50,3 +50,22 @@ describe("SidePanelController length limit (REQ-F04)", () => {
     expect(elements.messageArea.textContent).toMatch(/too long/i);
   });
 });
+
+describe("SidePanelController valid submit (REQ-F04)", () => {
+  it("calls the bridge once, disables the button while loading and shows the answer", async () => {
+    const pending = deferred();
+    bridge.sendQuery.mockReturnValue(pending.promise);
+    const controller = new SidePanelController(bridge, elements);
+    elements.input.value = "  what is a mutex?  ";
+
+    const submission = controller.handleUserSubmit();
+    expect(bridge.sendQuery).toHaveBeenCalledTimes(1);
+    expect(bridge.sendQuery).toHaveBeenCalledWith("what is a mutex?");
+    expect(elements.submitButton.disabled).toBe(true);
+
+    pending.resolve("a lock");
+    await submission;
+    expect(elements.answerArea.textContent).toBe("a lock");
+    expect(elements.submitButton.disabled).toBe(false);
+  });
+});
