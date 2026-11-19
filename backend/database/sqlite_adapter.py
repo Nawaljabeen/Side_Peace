@@ -2,7 +2,7 @@
 
 One adapter object owns the one connection to the database file. Parameterised SQL only.
 I/O runs in a worker thread (asyncio.to_thread) so the event loop is never blocked.
-Writes from concurrent callers must be serialised by the WriteQueue (see docs/thread-safety.md).
+All writes go through one WriteQueue, so they run one at a time (see docs/thread-safety.md).
 """
 import asyncio
 import logging
@@ -10,6 +10,7 @@ import sqlite3
 from pathlib import Path
 
 from database.base import AbstractStorageAdapter
+from database.write_queue import WriteQueue
 from errors import StorageError
 from services.models import Turn
 
@@ -25,7 +26,7 @@ class SQLiteAdapter(AbstractStorageAdapter):
     def __init__(self, db_path: str) -> None:
         self._db_path = db_path
         # isolation_level=None: we issue BEGIN/COMMIT ourselves. check_same_thread=False:
-        # the connection is used from asyncio.to_thread workers (one at a time, via the queue).
+        # writes reach the connection one at a time, through the WriteQueue.
         try:
             self._conn = sqlite3.connect(db_path, check_same_thread=False, isolation_level=None, timeout=5.0)
         except sqlite3.Error as exc:
@@ -39,6 +40,7 @@ class SQLiteAdapter(AbstractStorageAdapter):
             self._conn.close()
             logger.error("cannot initialise database: %s", exc)
             raise StorageError("cannot open the database") from exc
+        self._writes = WriteQueue()
 
     @classmethod
     def get_instance(cls, db_path: str | None = None) -> "SQLiteAdapter":
@@ -62,7 +64,7 @@ class SQLiteAdapter(AbstractStorageAdapter):
         return await self._run(self._get_turns_sync, session_id)
 
     async def add_turn(self, session_id: str, turn: Turn) -> int:
-        return await self._run(self._add_turn_sync, session_id, turn)
+        return await self._writes.submit(lambda: self._run(self._add_turn_sync, session_id, turn))
 
     async def _run(self, func, *args):
         """Run a blocking SQLite call in a worker thread; translate sqlite3 errors."""
