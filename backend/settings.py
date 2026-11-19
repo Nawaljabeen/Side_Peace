@@ -10,7 +10,7 @@ from pathlib import Path
 
 from errors import ConfigError
 
-DEFAULT_GEMINI_MODEL = "gemini-flash-latest"
+DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite"
 DEFAULT_DB_PATH = "sidepeace.db"
 DEFAULT_MAX_CONTEXT_TURNS = 20
 DEFAULT_MAX_CONTEXT_TOKENS = 6000
