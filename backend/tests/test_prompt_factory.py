@@ -33,3 +33,10 @@ def test_question_longer_than_limit_is_rejected():
 def test_question_exactly_at_limit_is_accepted():
     prompt = PromptFactory.build_sidekick_prompt([], "x" * MAX_QUESTION_LENGTH)
     assert "x" * MAX_QUESTION_LENGTH in prompt
+
+
+def test_prompt_marks_side_question_as_isolated_and_has_no_secrets():
+    prompt = PromptFactory.build_sidekick_prompt([], "hi")
+    assert "side question" in prompt.lower()
+    for forbidden in ("api_key", "apikey", "secret", "password", "token="):
+        assert forbidden not in prompt.lower()
