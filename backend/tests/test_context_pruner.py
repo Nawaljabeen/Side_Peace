@@ -37,3 +37,10 @@ def test_non_positive_max_turns_raises_value_error(max_turns):
 def test_non_positive_max_tokens_raises_value_error(max_tokens):
     with pytest.raises(ValueError):
         ContextPruner(max_turns=5, max_tokens=max_tokens)
+
+
+def test_token_budget_drops_oldest_turns_until_it_fits():
+    # default counter is about len/4, so each 40-char turn costs 10 tokens
+    turns = [Turn(i, "user" if i % 2 == 0 else "model", "x" * 40) for i in range(4)]
+    pruner = ContextPruner(max_turns=10, max_tokens=25)
+    assert pruner.prune(turns) == turns[2:]
