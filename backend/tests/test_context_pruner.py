@@ -57,3 +57,9 @@ def test_exactly_at_turn_limit_keeps_everything():
     turns = make_turns(3)
     pruner = ContextPruner(max_turns=3, max_tokens=1000)
     assert pruner.prune(turns) == turns
+
+
+def test_single_turn_larger_than_token_budget_is_dropped():
+    huge = [Turn(0, "user", "x" * 400)]  # about 100 tokens
+    pruner = ContextPruner(max_turns=5, max_tokens=10)
+    assert pruner.prune(huge) == []
