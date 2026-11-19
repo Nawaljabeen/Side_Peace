@@ -22,3 +22,7 @@ class ProviderRateLimitError(ProviderError):
 
 class ProviderBadResponseError(ProviderError):
     """The provider was unreachable, rejected the request, or returned an unusable answer."""
+
+
+class ConfigError(SidePeaceError):
+    """A setting is missing or invalid. Raised at start-up, before the server accepts requests."""

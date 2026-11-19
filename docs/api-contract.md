@@ -48,11 +48,16 @@ Every non-2xx response has exactly this shape (`docs/contract/error-*.json`):
 | 504 | `provider_timeout` | The provider took too long |
 | 500 | `storage_error` | Database failure |
 | 500 | `internal_error` | Anything unexpected (logged on the server) |
+| 404 | `not_found` | Unknown address |
+| 405 | `method_not_allowed` | Wrong HTTP method for an address |
 
 Rules:
 - `message` never contains a stack trace, file path, SQL or API key.
 - FastAPI's default 422 body is `{"detail": [...]}`. The Gateway **must** register a handler that converts it to the shape above.
 - The extension turns these into its own typed errors: network failure → `NetworkError`, 422 → `ValidationError`, 429/500/502/504 → `ServerError`.
+
+## Browser access (CORS)
+Only Chrome extension pages (`chrome-extension://<32 letters a-p>`) are allowed to call the API from a browser; other origins get no CORS headers. The server listens on `127.0.0.1:8000` only.
 
 ## Out of scope for M2
 Authentication, multiple users and streaming responses.

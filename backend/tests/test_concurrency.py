@@ -42,3 +42,24 @@ async def test_concurrent_writes_to_one_index_keep_the_last_submitted(adapter):
     await asyncio.gather(*(adapter.add_turn("s1", Turn(0, "user", f"v{i}")) for i in range(50)))
 
     assert await adapter.get_turns("s1") == [Turn(0, "user", "v49")]
+
+
+
+async def test_100_concurrent_reads_all_succeed(adapter):
+    for i in range(5):
+        await adapter.add_turn("s1", Turn(i, "user", f"msg{i}"))
+
+    results = await asyncio.gather(*(adapter.get_turns("s1") for _ in range(100)))
+
+    assert all([t.index for t in turns] == list(range(5)) for turns in results)
+
+
+async def test_reads_during_writes_never_fail_and_see_a_consistent_prefix(adapter):
+    writes = [adapter.add_turn("s1", Turn(i, "user", f"msg{i}")) for i in range(50)]
+    reads = [adapter.get_turns("s1") for _ in range(50)]
+
+    results = await asyncio.gather(*writes, *reads)
+
+    for turns in results[50:]:
+        assert [t.index for t in turns] == list(range(len(turns)))
+    assert len(await adapter.get_turns("s1")) == 50
