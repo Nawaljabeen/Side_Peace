@@ -11,3 +11,9 @@ def make_turns(count: int) -> list[Turn]:
 def test_empty_history_returns_empty_list():
     pruner = ContextPruner(max_turns=5, max_tokens=1000)
     assert pruner.prune([]) == []
+
+
+def test_fewer_turns_than_limit_are_all_kept():
+    turns = make_turns(3)
+    pruner = ContextPruner(max_turns=5, max_tokens=1000)
+    assert pruner.prune(turns) == turns
