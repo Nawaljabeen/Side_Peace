@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="840" viewBox="0 0 1000 840" font-family="Arial" font-size="13">
+<rect width="1000" height="840" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#333"/></marker></defs>
+<text x="16" y="26" font-size="15" font-weight="bold">CFG: GeminiAdapter.generate_response   N=11  E=14  V(G)=E-N+2=5</text>
+<rect x="160" y="42" width="280" height="56" rx="6" fill="#dae8fc" stroke="#333"/>
+<text x="300" y="66" text-anchor="middle">N1: build url/body</text>
+<text x="300" y="82" text-anchor="middle">try: await client.post(...)</text>
+<polygon points="300,142 435,190 300,238 165,190" fill="#fff2cc" stroke="#333"/>
+<text x="300" y="194" text-anchor="middle">N2: httpx.TimeoutException?</text>
+<polygon points="300,282 435,330 300,378 165,330" fill="#fff2cc" stroke="#333"/>
+<text x="300" y="334" text-anchor="middle">N3: other httpx.HTTPError?</text>
+<polygon points="300,422 435,470 300,518 165,470" fill="#fff2cc" stroke="#333"/>
+<text x="300" y="474" text-anchor="middle">N4: status == 429?</text>
+<polygon points="300,562 435,610 300,658 165,610" fill="#fff2cc" stroke="#333"/>
+<text x="300" y="614" text-anchor="middle">N5: status &gt;= 400?</text>
+<rect x="160" y="732" width="280" height="56" rx="6" fill="#dae8fc" stroke="#333"/>
+<text x="300" y="756" text-anchor="middle">N10: _extract_text(response)</text>
+<text x="300" y="772" text-anchor="middle">return text</text>
+<rect x="520" y="162" width="280" height="56" rx="6" fill="#f8cecc" stroke="#333"/>
+<text x="660" y="194" text-anchor="middle">N6: raise ProviderTimeoutError</text>
+<rect x="520" y="302" width="280" height="56" rx="6" fill="#f8cecc" stroke="#333"/>
+<text x="660" y="326" text-anchor="middle">N7: raise ProviderBadResponseError</text>
+<text x="660" y="342" text-anchor="middle">(could not be reached)</text>
+<rect x="520" y="442" width="280" height="56" rx="6" fill="#f8cecc" stroke="#333"/>
+<text x="660" y="474" text-anchor="middle">N8: raise ProviderRateLimitError</text>
+<rect x="520" y="582" width="280" height="56" rx="6" fill="#f8cecc" stroke="#333"/>
+<text x="660" y="606" text-anchor="middle">N9: raise ProviderBadResponseError</text>
+<text x="660" y="622" text-anchor="middle">(rejected the request)</text>
+<rect x="855" y="735" width="90" height="50" rx="6" fill="#d5e8d4" stroke="#333"/>
+<text x="900" y="764" text-anchor="middle">N11: exit</text>
+<path d="M300,98 L300,142" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M435,190 L520,190" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="469" y="184" font-size="12" fill="#333">yes (P2)</text>
+<path d="M300,238 L300,282" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="308" y="254" font-size="12" fill="#333">no</text>
+<path d="M435,330 L520,330" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="469" y="324" font-size="12" fill="#333">yes (P3)</text>
+<path d="M300,378 L300,422" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="308" y="394" font-size="12" fill="#333">no</text>
+<path d="M435,470 L520,470" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="469" y="464" font-size="12" fill="#333">yes (P4)</text>
+<path d="M300,518 L300,562" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="308" y="534" font-size="12" fill="#333">no</text>
+<path d="M435,610 L520,610" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="469" y="604" font-size="12" fill="#333">yes (P5)</text>
+<path d="M300,658 L300,732" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="308" y="674" font-size="12" fill="#333">no (P1)</text>
+<path d="M440,760 L855,760" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M800,190 L900,190 L900,735" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M800,330 L900,330 L900,735" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M800,470 L900,470 L900,735" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M800,610 L900,610 L900,735" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+</svg>

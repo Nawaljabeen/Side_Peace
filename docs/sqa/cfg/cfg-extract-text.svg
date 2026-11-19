@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="700" viewBox="0 0 1000 700" font-family="Arial" font-size="13">
+<rect width="1000" height="700" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#333"/></marker></defs>
+<text x="16" y="26" font-size="15" font-weight="bold">CFG: GeminiAdapter._extract_text   N=9  E=11  V(G)=E-N+2=4</text>
+<rect x="150" y="42" width="300" height="56" rx="6" fill="#dae8fc" stroke="#333"/>
+<text x="300" y="66" text-anchor="middle">N1: try: parts = response.json()</text>
+<text x="300" y="82" text-anchor="middle">[candidates][0][content][parts]</text>
+<polygon points="300,142 445,190 300,238 155,190" fill="#fff2cc" stroke="#333"/>
+<text x="300" y="194" text-anchor="middle">N2: shape error caught?</text>
+<polygon points="300,282 435,330 300,378 165,330" fill="#fff2cc" stroke="#333"/>
+<text x="300" y="334" text-anchor="middle">N3: more parts to join?</text>
+<rect x="520" y="305" width="240" height="50" rx="6" fill="#dae8fc" stroke="#333"/>
+<text x="640" y="334" text-anchor="middle">N4: text += part.get(text)</text>
+<polygon points="300,422 435,470 300,518 165,470" fill="#fff2cc" stroke="#333"/>
+<text x="300" y="474" text-anchor="middle">N5: text.strip() empty?</text>
+<rect x="500" y="162" width="280" height="56" rx="6" fill="#f8cecc" stroke="#333"/>
+<text x="640" y="186" text-anchor="middle">N6: raise ProviderBadResponseError</text>
+<text x="640" y="202" text-anchor="middle">(unexpected shape)</text>
+<rect x="500" y="442" width="280" height="56" rx="6" fill="#f8cecc" stroke="#333"/>
+<text x="640" y="466" text-anchor="middle">N7: raise ProviderBadResponseError</text>
+<text x="640" y="482" text-anchor="middle">(empty answer)</text>
+<rect x="180" y="595" width="240" height="50" rx="6" fill="#dae8fc" stroke="#333"/>
+<text x="300" y="624" text-anchor="middle">N8: return text</text>
+<rect x="835" y="595" width="90" height="50" rx="6" fill="#d5e8d4" stroke="#333"/>
+<text x="880" y="624" text-anchor="middle">N9: exit</text>
+<path d="M300,98 L300,142" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M445,190 L500,190" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="464" y="184" font-size="12" fill="#333">yes (P2)</text>
+<path d="M300,238 L300,282" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="308" y="254" font-size="12" fill="#333">no</text>
+<path d="M435,330 L520,330" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="469" y="324" font-size="12" fill="#333">yes</text>
+<path d="M640,305 L640,262 L300,262 L300,282" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="648" y="321" font-size="12" fill="#333">loop</text>
+<path d="M300,378 L300,422" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="308" y="394" font-size="12" fill="#333">no</text>
+<path d="M435,470 L500,470" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="459" y="464" font-size="12" fill="#333">yes (P3,P4)</text>
+<path d="M300,518 L300,595" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<text x="308" y="534" font-size="12" fill="#333">no (P1)</text>
+<path d="M780,190 L880,190 L880,595" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M780,470 L880,470 L880,595" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M420,620 L835,620" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+</svg>
