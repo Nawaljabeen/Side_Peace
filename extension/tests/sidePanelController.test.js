@@ -132,3 +132,28 @@ describe("SidePanelController clears old answers (REQ-F04)", () => {
     expect(elements.messageArea.textContent).toMatch(/could not reach/i);
   });
 });
+
+describe("SidePanelController clears the answer on every submit (REQ-F04)", () => {
+  it("removes the previous answer when the next input is empty", async () => {
+    const controller = new SidePanelController(bridge, elements);
+    elements.input.value = "first";
+    await controller.handleUserSubmit();
+    expect(elements.answerArea.textContent).toBe("canned answer");
+
+    elements.input.value = "   ";
+    await controller.handleUserSubmit();
+    expect(elements.answerArea.textContent).toBe("");
+    expect(elements.messageArea.textContent).toMatch(/type a question/i);
+  });
+
+  it("removes the previous answer when the next input is too long", async () => {
+    const controller = new SidePanelController(bridge, elements);
+    elements.input.value = "first";
+    await controller.handleUserSubmit();
+
+    elements.input.value = "x".repeat(MAX_QUERY_LENGTH + 1);
+    await controller.handleUserSubmit();
+    expect(elements.answerArea.textContent).toBe("");
+    expect(elements.messageArea.textContent).toMatch(/too long/i);
+  });
+});
