@@ -2,11 +2,13 @@
 
 One adapter object owns the one connection to the database file. Parameterised SQL only.
 I/O runs in a worker thread (asyncio.to_thread) so the event loop is never blocked.
-All writes go through one WriteQueue, so they run one at a time (see docs/thread-safety.md).
+All writes go through one WriteQueue (FIFO), and every use of the connection takes a lock, so reads
+and writes never touch it at the same time (see docs/thread-safety.md).
 """
 import asyncio
 import logging
 import sqlite3
+import threading
 from pathlib import Path
 
 from database.base import AbstractStorageAdapter
@@ -26,7 +28,7 @@ class SQLiteAdapter(AbstractStorageAdapter):
     def __init__(self, db_path: str) -> None:
         self._db_path = db_path
         # isolation_level=None: we issue BEGIN/COMMIT ourselves. check_same_thread=False:
-        # writes reach the connection one at a time, through the WriteQueue.
+        # worker threads share the connection, taking turns under _conn_lock (see below).
         try:
             self._conn = sqlite3.connect(db_path, check_same_thread=False, isolation_level=None, timeout=5.0)
         except sqlite3.Error as exc:
@@ -40,6 +42,9 @@ class SQLiteAdapter(AbstractStorageAdapter):
             self._conn.close()
             logger.error("cannot initialise database: %s", exc)
             raise StorageError("cannot open the database") from exc
+        # One connection is shared by worker threads, and sqlite3 connections do not tolerate two threads
+        # using them at once. The lock makes every read and every write transaction take its turn.
+        self._conn_lock = threading.Lock()
         self._writes = WriteQueue()
 
     @classmethod
@@ -75,12 +80,17 @@ class SQLiteAdapter(AbstractStorageAdapter):
             raise StorageError("storage operation failed") from exc
 
     def _get_turns_sync(self, session_id: str) -> list[Turn]:
-        rows = self._conn.execute(
-            "SELECT idx, role, text FROM turns WHERE session_id = ? ORDER BY idx", (session_id,)
-        ).fetchall()
+        with self._conn_lock:
+            rows = self._conn.execute(
+                "SELECT idx, role, text FROM turns WHERE session_id = ? ORDER BY idx", (session_id,)
+            ).fetchall()
         return [Turn(index=idx, role=role, text=text) for idx, role, text in rows]
 
     def _add_turn_sync(self, session_id: str, turn: Turn) -> int:
+        with self._conn_lock:
+            return self._add_turn_locked(session_id, turn)
+
+    def _add_turn_locked(self, session_id: str, turn: Turn) -> int:
         self._conn.execute("BEGIN IMMEDIATE")
         try:
             self._conn.execute("INSERT OR IGNORE INTO sessions(session_id) VALUES (?)", (session_id,))

@@ -8,6 +8,7 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from errors import (
     ProviderBadResponseError,
@@ -31,6 +32,13 @@ _KNOWN_ERRORS = {
 }
 
 
+# routing failures raised by the framework itself: HTTP status -> (machine code, safe message)
+_HTTP_ERRORS = {
+    404: ("not_found", "That address does not exist."),
+    405: ("method_not_allowed", "That method is not allowed here."),
+}
+
+
 def _error_response(status: int, code: str, message: str) -> JSONResponse:
     return JSONResponse(status_code=status, content={"error": code, "message": message})
 
@@ -49,6 +57,11 @@ def register_error_handlers(app: FastAPI) -> None:
     async def on_validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:
         logger.info("validation error path=%s", request.url.path)
         return _error_response(422, "validation_error", _validation_message(exc))
+
+    @app.exception_handler(StarletteHTTPException)
+    async def on_http_error(request: Request, exc: StarletteHTTPException) -> JSONResponse:
+        code, message = _HTTP_ERRORS.get(exc.status_code, ("http_error", "The request could not be handled."))
+        return _error_response(exc.status_code, code, message)
 
     def make_handler(status: int, code: str, message: str):
         async def handler(request: Request, exc: Exception) -> JSONResponse:
