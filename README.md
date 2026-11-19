@@ -10,8 +10,10 @@ Side Peace is a real time Chrome companion that acts as a quiet memory keeper fo
 ```
 Side_Peace/
 ├── backend/                 Python FastAPI server
-│   ├── main.py              create_app() factory + app for uvicorn
-│   ├── api/                 HTTP routers (/health, later /sync, /query)
+│   ├── main.py              create_app(provider, storage) application factory
+│   ├── server.py            composition root: real Gemini + SQLite wiring, run with `python server.py`
+│   ├── settings.py          settings from environment variables / backend/.env
+│   ├── api/                 HTTP routers (/health, /sync, /query), schemas, error handlers
 │   ├── database/            State & Storage Manager (SQLiteAdapter, WriteQueue, SessionManager)   [Wave 1]
 │   ├── services/            LLM providers (AbstractLLMProvider, GeminiAdapter), ContextPruner, PromptFactory [Wave 1–2]
 │   └── tests/               pytest suite
@@ -43,8 +45,10 @@ python -m venv .venv
 # Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 pytest --cov                      # run tests with coverage
-uvicorn main:app --reload         # serve on http://localhost:8000  (check /health)
+copy .env.example .env            # Windows (macOS/Linux: cp .env.example .env); then put your Gemini key in .env
+python server.py                  # serve on http://localhost:8000  (check /health); stop with Ctrl+C
 ```
+The Gemini API key lives only in `backend/.env` (gitignored). Never commit it or paste it in chat, issues or pull requests. Tests never need a key.
 
 ### Extension
 
