@@ -12,6 +12,7 @@ export class SidePanelController {
 
   async handleUserSubmit() {
     const text = this.input.value.trim();
+    this.answerArea.textContent = "";
     if (!text) {
       this.renderError("Please type a question.");
       return;
