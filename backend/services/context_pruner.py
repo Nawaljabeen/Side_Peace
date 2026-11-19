@@ -13,4 +13,12 @@ class ContextPruner:
         self.token_counter = token_counter
 
     def prune(self, turns: list[Turn]) -> list[Turn]:
-        return turns[-self.max_turns:]
+        pruned = turns[-self.max_turns:]
+        while pruned and self._total_tokens(pruned) > self.max_tokens:
+            pruned = pruned[1:]
+        return pruned
+
+    @staticmethod
+    def _total_tokens(turns: list[Turn]) -> int:
+        # rough estimate: about 4 characters per token
+        return sum(-(-len(turn.text) // 4) for turn in turns)
