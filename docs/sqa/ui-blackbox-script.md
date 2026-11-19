@@ -22,11 +22,12 @@ Run 2026-11-19, Chrome 157 (automated, headless), extension loaded unpacked from
 
 Defect found by this script: the previous answer stayed visible next to a network error. Fixed test-first (commits 63d4542, f04b9b6, PR #21).
 
-## Signed-in run on real Gemini (2026-11-19, 10:18)
+## Signed-in run on real Gemini (2026-11-19, 10:42)
 
-The real extension (loaded unpacked in Ammar's own signed-in Chrome 157, branch `feature/panel-controller`) was opened beside a signed-in
-`gemini.google.com` chat. The panel was shown in its own window next to Gemini, and driven with Tab/Enter only. The Gemini sidebar (account
-name and chat titles) is cropped out of the images. The panel still uses the demo bridge (`?demo=fail` simulates the failure).
+The real extension (loaded unpacked in Ammar's own signed-in Chrome 157, branch `feature/panel-controller`) was opened with the toolbar icon, which
+docks **Chrome's built-in side panel** next to a signed-in `gemini.google.com` chat (`openPanelOnActionClick` in `background/service_worker.js`).
+Input was typed into the panel; the Gemini sidebar (account name and chat titles) is cropped out of the images. The panel uses the demo bridge; a
+question containing "simulate failure" makes the bridge fail.
 
 | State | Expected | Result | Screenshot |
 |---|---|---|---|
@@ -34,9 +35,9 @@ name and chat titles) is cropped out of the images. The panel still uses the dem
 | Validation error | "Please type a question.", no request | Pass | screenshots/signed-2-validation.png |
 | Loading | Ask button disabled while the request runs | Pass | screenshots/signed-3-loading.png |
 | Answer | Answer rendered as text under the form | Pass | screenshots/signed-4-answer.png |
-| Network error | Friendly "Could not reach the SidePeace server" message, no answer shown | Pass | screenshots/signed-5-network-error.png |
+| Network error | "Could not reach the SidePeace server", previous answer cleared | Pass | screenshots/signed-5-network-error.png |
 
-Remaining limits: the panel is a separate window, not Chrome's built-in side-panel dock (the dock opened during the first attempt showed the stale Wave 0
-placeholder because the panel was already open); the answers come from the demo bridge, not the real backend, until Nawal's ExtensionBridge merges.
+Remaining limit: answers come from the demo bridge, not the real backend, until Nawal's ExtensionBridge merges.
+(An earlier version of these screenshots showed the panel in a separate window; they were replaced with these docked-panel captures.)
 
 **Correction:** an earlier version of this document claimed the extension's service worker had started. That was wrong: the worker I saw belonged to Chrome's built-in "Google Network Speech" component, because `--load-extension` is ignored in current branded Chrome. The extension was not actually loaded in that run; the results above come from the corrected run.
