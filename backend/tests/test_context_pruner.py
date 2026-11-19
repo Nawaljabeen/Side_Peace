@@ -1,4 +1,6 @@
 """Unit tests for ContextPruner (REQ-F03: prune chat history to fit limits)."""
+import random
+
 import pytest
 
 from services.context_pruner import ContextPruner
@@ -63,3 +65,19 @@ def test_single_turn_larger_than_token_budget_is_dropped():
     huge = [Turn(0, "user", "x" * 400)]  # about 100 tokens
     pruner = ContextPruner(max_turns=5, max_tokens=10)
     assert pruner.prune(huge) == []
+
+
+def test_result_is_always_a_suffix_within_both_limits():
+    rng = random.Random(423)  # fixed seed keeps the test reproducible
+    for _ in range(200):
+        turns = [
+            Turn(i, "user" if i % 2 == 0 else "model", "x" * rng.randint(1, 120))
+            for i in range(rng.randint(0, 15))
+        ]
+        max_turns = rng.randint(1, 10)
+        max_tokens = rng.randint(1, 80)
+        result = ContextPruner(max_turns, max_tokens).prune(turns)
+
+        assert result == turns[len(turns) - len(result):]  # newest turns, order kept
+        assert len(result) <= max_turns
+        assert sum(-(-len(t.text) // 4) for t in result) <= max_tokens
