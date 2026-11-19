@@ -157,3 +157,23 @@ describe("SidePanelController clears the answer on every submit (REQ-F04)", () =
     expect(elements.messageArea.textContent).toMatch(/too long/i);
   });
 });
+
+describe("SidePanelController ignores a pending reply after a rejected submit (REQ-F04)", () => {
+  it("does not show a late answer once an empty submit has cleared the panel", async () => {
+    const pending = deferred();
+    bridge.sendQuery.mockReturnValue(pending.promise);
+    const controller = new SidePanelController(bridge, elements);
+
+    elements.input.value = "slow question";
+    const firstSubmission = controller.handleUserSubmit();
+
+    elements.input.value = "";
+    await controller.handleUserSubmit();
+
+    pending.resolve("late answer");
+    await firstSubmission;
+
+    expect(elements.answerArea.textContent).toBe("");
+    expect(elements.messageArea.textContent).toMatch(/type a question/i);
+  });
+});
