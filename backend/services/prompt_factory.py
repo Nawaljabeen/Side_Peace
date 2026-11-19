@@ -7,5 +7,8 @@ MAX_QUESTION_LENGTH = 2000
 class PromptFactory:
     @staticmethod
     def build_sidekick_prompt(context: list[Turn], question: str) -> str:
-        history = "\n".join(f"{turn.role}: {turn.text}" for turn in context)
+        if context:
+            history = "\n".join(f"{turn.role}: {turn.text}" for turn in context)
+        else:
+            history = "(no previous conversation)"
         return f"{history}\n\nQuestion: {question}"
