@@ -9,4 +9,4 @@ class ContextPruner:
         self.token_counter = token_counter
 
     def prune(self, turns: list[Turn]) -> list[Turn]:
-        return []
+        return list(turns)
