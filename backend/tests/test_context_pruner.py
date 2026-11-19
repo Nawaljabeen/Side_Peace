@@ -17,3 +17,9 @@ def test_fewer_turns_than_limit_are_all_kept():
     turns = make_turns(3)
     pruner = ContextPruner(max_turns=5, max_tokens=1000)
     assert pruner.prune(turns) == turns
+
+
+def test_more_turns_than_limit_keeps_newest_in_order():
+    turns = make_turns(6)
+    pruner = ContextPruner(max_turns=3, max_tokens=1000)
+    assert pruner.prune(turns) == turns[3:]
