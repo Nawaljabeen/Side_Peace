@@ -7,6 +7,7 @@ export class SidePanelController {
     this.submitButton = elements.submitButton;
     this.messageArea = elements.messageArea;
     this.answerArea = elements.answerArea;
+    this.latestRequestId = 0;
   }
 
   async handleUserSubmit() {
@@ -19,16 +20,23 @@ export class SidePanelController {
       this.renderError(`Question is too long (max ${MAX_QUERY_LENGTH} characters).`);
       return;
     }
+    const requestId = ++this.latestRequestId;
     this.messageArea.textContent = "";
     this.submitButton.disabled = true;
     try {
       const answer = await this.bridge.sendQuery(text);
-      this.renderResponse(answer);
+      if (requestId === this.latestRequestId) {
+        this.renderResponse(answer);
+      }
     } catch (error) {
       console.error("Side query failed", error);
-      this.renderError("Could not reach the SidePeace server. Please try again.");
+      if (requestId === this.latestRequestId) {
+        this.renderError("Could not reach the SidePeace server. Please try again.");
+      }
     } finally {
-      this.submitButton.disabled = false;
+      if (requestId === this.latestRequestId) {
+        this.submitButton.disabled = false;
+      }
     }
   }
 
