@@ -96,3 +96,24 @@ describe("SidePanelController failure handling (REQ-F04, REQ-Q02)", () => {
     expect(elements.submitButton.disabled).toBe(false);
   });
 });
+
+describe("SidePanelController stale responses (REQ-F04)", () => {
+  it("shows only the latest answer when an older reply arrives last", async () => {
+    const first = deferred();
+    const second = deferred();
+    bridge.sendQuery.mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
+    const controller = new SidePanelController(bridge, elements);
+
+    elements.input.value = "first question";
+    const firstSubmission = controller.handleUserSubmit();
+    elements.input.value = "second question";
+    const secondSubmission = controller.handleUserSubmit();
+
+    second.resolve("second answer");
+    await secondSubmission;
+    first.resolve("first answer");
+    await firstSubmission;
+
+    expect(elements.answerArea.textContent).toBe("second answer");
+  });
+});
