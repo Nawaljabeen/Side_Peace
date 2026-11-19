@@ -44,3 +44,10 @@ def test_token_budget_drops_oldest_turns_until_it_fits():
     turns = [Turn(i, "user" if i % 2 == 0 else "model", "x" * 40) for i in range(4)]
     pruner = ContextPruner(max_turns=10, max_tokens=25)
     assert pruner.prune(turns) == turns[2:]
+
+
+def test_injected_token_counter_is_used():
+    turns = make_turns(4)
+    one_token_each = lambda text: 1  # noqa: E731
+    pruner = ContextPruner(max_turns=10, max_tokens=2, token_counter=one_token_each)
+    assert pruner.prune(turns) == turns[2:]
