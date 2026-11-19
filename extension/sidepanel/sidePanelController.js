@@ -21,9 +21,15 @@ export class SidePanelController {
     }
     this.messageArea.textContent = "";
     this.submitButton.disabled = true;
-    const answer = await this.bridge.sendQuery(text);
-    this.renderResponse(answer);
-    this.submitButton.disabled = false;
+    try {
+      const answer = await this.bridge.sendQuery(text);
+      this.renderResponse(answer);
+    } catch (error) {
+      console.error("Side query failed", error);
+      this.renderError("Could not reach the SidePeace server. Please try again.");
+    } finally {
+      this.submitButton.disabled = false;
+    }
   }
 
   renderResponse(answer) {
