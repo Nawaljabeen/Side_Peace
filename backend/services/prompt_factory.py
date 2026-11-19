@@ -3,6 +3,12 @@ from services.models import Turn
 
 MAX_QUESTION_LENGTH = 2000
 
+_TEMPLATE = (
+    "You are a side-kick assistant. Answer the side question below using the earlier "
+    "conversation only as background. Do not continue the main conversation.\n\n"
+    "Earlier conversation:\n{history}\n\nSide question: {question}"
+)
+
 
 class PromptFactory:
     @staticmethod
@@ -15,4 +21,4 @@ class PromptFactory:
             history = "\n".join(f"{turn.role}: {turn.text}" for turn in context)
         else:
             history = "(no previous conversation)"
-        return f"{history}\n\nQuestion: {question}"
+        return _TEMPLATE.format(history=history, question=question)
