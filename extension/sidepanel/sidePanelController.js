@@ -17,7 +17,17 @@ export class SidePanelController {
     }
     if (text.length > MAX_QUERY_LENGTH) {
       this.renderError(`Question is too long (max ${MAX_QUERY_LENGTH} characters).`);
+      return;
     }
+    this.messageArea.textContent = "";
+    this.submitButton.disabled = true;
+    const answer = await this.bridge.sendQuery(text);
+    this.renderResponse(answer);
+    this.submitButton.disabled = false;
+  }
+
+  renderResponse(answer) {
+    this.answerArea.textContent = answer;
   }
 
   renderError(message) {
