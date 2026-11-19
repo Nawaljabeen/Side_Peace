@@ -3,13 +3,20 @@
 Artifact: Nazaar's Storage + Gateway code, frozen at a recorded commit SHA (fill in at planning).
 Roles: Moderator = Ammar, Author = Nazaar, Reader/Recorder = Nawal, plus one inspector from another team.
 
-## Planning record (fill in, do not guess)
+## Planning record
 | Item | Value |
 |---|---|
-| Frozen commit SHA | _TBD_ |
-| Files and line count | _TBD_ |
-| Meeting date | _TBD (week 9)_ |
-| Outside inspector | _TBD_ |
+| Frozen commit SHA | `e0192a5` (merge of PR #28 on `main`), announced by the Author (Nazaar) |
+| Roles | Moderator: Ammar Zahid; Author: Nazaar Khalid; Reader/Recorder: Nawal Jabeen; outside inspector: see below |
+| Scope (about 426 lines at the SHA) | `backend/database/`: `base.py` 23, `memory_adapter.py` 18, `session_manager.py` 27, `sqlite_adapter.py` 108, `write_queue.py` 49, `schema.sql` 11 (236). `backend/api/`: `dependencies.py` 12, `error_handlers.py` 79, `health.py` 7, `query.py` 29, `schemas.py` 48, `sync.py` 15 (190). Counts from `git show e0192a5:<file> | wc -l`. The Author's own scope list is the authority; this table is the Moderator's reconstruction and must be confirmed |
+| Not in scope | `main.py`, `server.py`, `settings.py`, `errors.py`, `services/gemini_adapter.py`, `services/llm_provider.py` (284 lines), and the Moderator's own modules |
+| Preparation effort | about 150-200 lines/hour, so about 2-3 hours per inspector for 426 lines |
+| Meeting date | _TBD (to be booked; week 9)_ |
+| Outside inspector | _TBD (Nawal asked the instructor which team)_ |
+| Author's overview | to be sent by the Author before the meeting |
+
+### Known item declared by the Author before the inspection
+`settings.py` accepts non-ASCII digits (`isdigit()`): reported in the PR #28 review and fixed in PR #35 (separate branch, after the frozen SHA). It is outside the frozen scope, so it is not an inspection finding; it is listed here for traceability only.
 
 ## Checklist (answer Yes / No / N/A per file, cite file:line for every No)
 | # | Question | Defect type if No |
