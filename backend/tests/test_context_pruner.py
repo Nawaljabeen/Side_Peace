@@ -51,3 +51,9 @@ def test_injected_token_counter_is_used():
     one_token_each = lambda text: 1  # noqa: E731
     pruner = ContextPruner(max_turns=10, max_tokens=2, token_counter=one_token_each)
     assert pruner.prune(turns) == turns[2:]
+
+
+def test_exactly_at_turn_limit_keeps_everything():
+    turns = make_turns(3)
+    pruner = ContextPruner(max_turns=3, max_tokens=1000)
+    assert pruner.prune(turns) == turns
