@@ -63,3 +63,11 @@ describe("initSidePanel server status (REQ-F04, REQ-Q02)", () => {
     expect(fetchFn).toHaveBeenCalledWith("http://localhost:8000/health");
   });
 });
+
+describe("initSidePanel defensive checks (REQ-Q02)", () => {
+  it("names the missing element instead of failing with a vague TypeError", () => {
+    document.body.innerHTML = '<form id="query-form"></form>';
+    const bridge = { sendQuery: vi.fn() };
+    expect(() => initSidePanel({ document, bridge, backendUrl: "http://x", fetchFn: okHealth() })).toThrow(/#query/);
+  });
+});
