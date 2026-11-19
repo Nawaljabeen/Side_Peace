@@ -40,3 +40,13 @@ describe("SidePanelController input validation (REQ-F04)", () => {
     expect(elements.messageArea.textContent).toMatch(/type a question/i);
   });
 });
+
+describe("SidePanelController length limit (REQ-F04)", () => {
+  it("rejects input longer than the limit without calling the bridge", async () => {
+    const controller = new SidePanelController(bridge, elements);
+    elements.input.value = "x".repeat(MAX_QUERY_LENGTH + 1);
+    await controller.handleUserSubmit();
+    expect(bridge.sendQuery).not.toHaveBeenCalled();
+    expect(elements.messageArea.textContent).toMatch(/too long/i);
+  });
+});
