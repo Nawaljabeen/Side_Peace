@@ -69,3 +69,18 @@ describe("SidePanelController valid submit (REQ-F04)", () => {
     expect(elements.submitButton.disabled).toBe(false);
   });
 });
+
+describe("SidePanelController output safety (REQ-F04)", () => {
+  it("renders answers as text, never as HTML", () => {
+    const controller = new SidePanelController(bridge, elements);
+    controller.renderResponse("<img src=x onerror=alert(1)>");
+    expect(elements.answerArea.querySelector("img")).toBeNull();
+    expect(elements.answerArea.textContent).toBe("<img src=x onerror=alert(1)>");
+  });
+
+  it("renders error messages as text, never as HTML", () => {
+    const controller = new SidePanelController(bridge, elements);
+    controller.renderError("<b>bold</b>");
+    expect(elements.messageArea.querySelector("b")).toBeNull();
+  });
+});
