@@ -7,7 +7,8 @@ Run 2026-11-19, Chrome 157 (automated, headless), extension loaded unpacked from
 - Gemini was **not signed in** (no Google credentials were used), so no real chat was extracted; `gemini-page.png` only shows the real page with the extension loaded.
 - The panel was opened as a tab at `chrome-extension://<id>/sidepanel/sidepanel.html`, not through Chrome's side-panel UI.
 - The panel uses the demo fake bridge until Nawal's ExtensionBridge merges, so the **network error** state cannot occur in the real page; step 6 uses a harness with a failing bridge.
-- Still to do by hand: a signed-in Gemini run and a check of `chrome://extensions` for an error badge.
+- `chrome://extensions` (Developer mode on) shows SidePeace 0.1.0 enabled, service worker inspectable, **no Errors button** (screenshots/0-chrome-extensions-page.png; automated Chrome profile, not your daily profile).
+- Still to do by hand: a signed-in Gemini run.
 
 | Step | Action | Expected | Result | Screenshot |
 |---|---|---|---|---|
