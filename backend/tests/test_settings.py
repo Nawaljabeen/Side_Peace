@@ -60,6 +60,12 @@ def test_bad_numbers_are_rejected(name, value):
     with pytest.raises(ConfigError):
         load_settings({"GEMINI_API_KEY": KEY, name: value})
 
+@pytest.mark.parametrize("name", ["MAX_CONTEXT_TURNS", "MAX_CONTEXT_TOKENS"])
+@pytest.mark.parametrize("value", ["²", "٣", "①"])
+def test_non_ascii_digits_are_rejected_with_a_config_error(name, value):
+    with pytest.raises(ConfigError):
+        load_settings({"GEMINI_API_KEY": KEY, name: value})
+
 
 def test_settings_repr_hides_the_key():
     settings = load_settings({"GEMINI_API_KEY": KEY})

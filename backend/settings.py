@@ -52,7 +52,7 @@ def _positive_int(values: Mapping[str, str], name: str, default: int) -> int:
     if name not in values:
         return default
     raw = values[name].strip()
-    if not raw.isdigit() or int(raw) <= 0:
+    if not (raw.isascii() and raw.isdigit()) or int(raw) <= 0:
         raise ConfigError(f"{name} must be a whole number greater than 0")
     return int(raw)
 
