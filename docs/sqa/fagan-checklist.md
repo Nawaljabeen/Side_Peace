@@ -8,9 +8,9 @@ Roles: Moderator = Ammar, Author = Nazaar, Reader/Recorder = Nawal, plus one ins
 |---|---|
 | Frozen commit SHA | `e0192a5` (merge of PR #28 on `main`), announced by the Author (Nazaar) |
 | Roles | Moderator: Ammar Zahid; Author: Nazaar Khalid; Reader/Recorder: Nawal Jabeen; outside inspector: see below |
-| Scope (about 426 lines at the SHA) | `backend/database/`: `base.py` 23, `memory_adapter.py` 18, `session_manager.py` 27, `sqlite_adapter.py` 108, `write_queue.py` 49, `schema.sql` 11 (236). `backend/api/`: `dependencies.py` 12, `error_handlers.py` 79, `health.py` 7, `query.py` 29, `schemas.py` 48, `sync.py` 15 (190). Counts from `git show e0192a5:<file> | wc -l`. The Author's own scope list is the authority; this table is the Moderator's reconstruction and must be confirmed |
-| Not in scope | `main.py`, `server.py`, `settings.py`, `errors.py`, `services/gemini_adapter.py`, `services/llm_provider.py` (284 lines), and the Moderator's own modules |
-| Preparation effort | about 150-200 lines/hour, so about 2-3 hours per inspector for 426 lines |
+| Scope (421 lines at the SHA, as listed by the Author) | `backend/database/sqlite_adapter.py` 108 (Singleton, lock and queue use; CAPA-01 area); `backend/database/write_queue.py` 49 (concurrency, REQ-Q05, Q06); `backend/database/session_manager.py` 27 (dependency injection); `backend/services/gemini_adapter.py` 64 (Adapter pattern, key handling, REQ-F02); `backend/api/error_handlers.py` 79 (error contract, REQ-Q02, Q08); `backend/api/query.py` 30 (`/query` route); `backend/api/sync.py` 16 (`/sync` route); `backend/api/schemas.py` 48 (validation, REQ-F05). Source: the Author's scope table; line counts are the Author's |
+| Not in scope | everything else, including `main.py`, `server.py`, `settings.py`, `errors.py`, `llm_provider.py`, `base.py`, `memory_adapter.py`, `dependencies.py`, `health.py`, and the Moderator's own modules (`context_pruner.py`, `prompt_factory.py`, the side panel) |
+| Preparation effort | about 150-200 lines/hour, so about 2-3 hours per inspector for 421 lines |
 | Meeting date | _TBD (to be booked; week 9)_ |
 | Outside inspector | _TBD (Nawal asked the instructor which team)_ |
 | Author's overview | to be sent by the Author before the meeting |
