@@ -177,3 +177,23 @@ describe("SidePanelController ignores a pending reply after a rejected submit (R
     expect(elements.messageArea.textContent).toMatch(/type a question/i);
   });
 });
+
+describe("SidePanelController re-enables Ask after a rejected submit (REQ-F04)", () => {
+  it("does not leave the button disabled when a pending request was invalidated", async () => {
+    const pending = deferred();
+    bridge.sendQuery.mockReturnValue(pending.promise);
+    const controller = new SidePanelController(bridge, elements);
+
+    elements.input.value = "slow question";
+    const firstSubmission = controller.handleUserSubmit();
+    expect(elements.submitButton.disabled).toBe(true);
+
+    elements.input.value = "";
+    await controller.handleUserSubmit();
+    expect(elements.submitButton.disabled).toBe(false);
+
+    pending.resolve("late answer");
+    await firstSubmission;
+    expect(elements.submitButton.disabled).toBe(false);
+  });
+});
