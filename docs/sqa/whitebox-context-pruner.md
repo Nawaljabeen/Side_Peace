@@ -1,7 +1,7 @@
 # White-box test design: `ContextPruner.prune` (SE431)
 
 Derived from the built code in `backend/services/context_pruner.py` on branch `feature/context-pruner`
-(re-check against the final merged version before submission; add a draw.io screenshot of the CFG).
+(re-check against the final merged version before submission).
 
 ```python
 def prune(self, turns):
@@ -12,6 +12,10 @@ def prune(self, turns):
 ```
 
 ## Control flow graph
+![CFG of ContextPruner.prune](pruner-cfg.png)
+
+Editable source: `pruner-cfg.drawio` (open in draw.io). Text version of the same graph:
+
 ```mermaid
 flowchart TD
   N1[N1: slice newest max_turns] --> N2{N2: pruned non-empty?}
