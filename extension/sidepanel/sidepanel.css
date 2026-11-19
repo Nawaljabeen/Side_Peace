@@ -8,3 +8,6 @@ button:disabled { cursor: progress; opacity: 0.6; }
 #message { margin-top: 8px; color: #b42318; min-height: 1.2em; }
 #answer { margin-top: 12px; white-space: pre-wrap; background: #f5f7fa; border-radius: 6px; padding: 8px; }
 #answer:empty { display: none; }
+.server-status { font-size: 0.8rem; margin: 0 0 12px; color: #52606d; }
+.server-status[data-state="up"] { color: #1a7f37; }
+.server-status[data-state="down"] { color: #b42318; }
