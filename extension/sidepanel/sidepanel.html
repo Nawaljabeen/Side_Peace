@@ -2,10 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SidePeace</title>
+    <link rel="stylesheet" href="sidepanel.css" />
   </head>
   <body>
-    <h1>SidePeace</h1>
-    <p>Side panel placeholder (Wave 0).</p>
+    <main>
+      <h1>SidePeace</h1>
+      <p class="hint">Ask a side question. Your main chat stays untouched.</p>
+      <p id="server-status" class="server-status" aria-live="polite">Server: checking...</p>
+      <form id="query-form">
+        <label for="query">Side question</label>
+        <textarea id="query" rows="4" placeholder="e.g. What does this line do?"></textarea>
+        <button id="submit" type="submit">Ask</button>
+      </form>
+      <div id="message" role="alert" aria-live="polite"></div>
+      <section id="answer" aria-live="polite"></section>
+    </main>
+    <script type="module" src="sidepanel.js"></script>
   </body>
 </html>
