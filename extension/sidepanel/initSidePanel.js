@@ -1,6 +1,7 @@
 import { SidePanelController } from "./sidePanelController.js";
+import { checkServer } from "./serverStatus.js";
 
-export function initSidePanel({ document, bridge }) {
+export function initSidePanel({ document, bridge, backendUrl, fetchFn }) {
   const controller = new SidePanelController(bridge, {
     input: document.getElementById("query"),
     submitButton: document.getElementById("submit"),
@@ -11,5 +12,11 @@ export function initSidePanel({ document, bridge }) {
     event.preventDefault();
     controller.handleUserSubmit();
   });
-  return { controller, ready: Promise.resolve() };
+
+  const serverStatus = document.getElementById("server-status");
+  const ready = checkServer(backendUrl, fetchFn).then((isUp) => {
+    serverStatus.dataset.state = isUp ? "up" : "down";
+    serverStatus.textContent = isUp ? "Server: connected" : "Server: not running (demo answers only)";
+  });
+  return { controller, ready };
 }
