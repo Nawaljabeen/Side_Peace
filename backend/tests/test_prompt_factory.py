@@ -11,3 +11,9 @@ def test_prompt_contains_context_turns_and_question():
     assert "What is a mutex?" in prompt
     assert "A lock for shared data." in prompt
     assert "Why does it matter?" in prompt
+
+
+def test_empty_context_still_produces_a_prompt_with_the_question():
+    prompt = PromptFactory.build_sidekick_prompt([], "What is a mutex?")
+    assert "What is a mutex?" in prompt
+    assert "no previous conversation" in prompt.lower()
