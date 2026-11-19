@@ -117,3 +117,18 @@ describe("SidePanelController stale responses (REQ-F04)", () => {
     expect(elements.answerArea.textContent).toBe("second answer");
   });
 });
+
+describe("SidePanelController clears old answers (REQ-F04)", () => {
+  it("removes the previous answer when a new question fails", async () => {
+    const controller = new SidePanelController(bridge, elements);
+    elements.input.value = "first";
+    await controller.handleUserSubmit();
+    expect(elements.answerArea.textContent).toBe("canned answer");
+
+    bridge.sendQuery.mockRejectedValue(new TypeError("Failed to fetch"));
+    elements.input.value = "second";
+    await controller.handleUserSubmit();
+    expect(elements.answerArea.textContent).toBe("");
+    expect(elements.messageArea.textContent).toMatch(/could not reach/i);
+  });
+});
