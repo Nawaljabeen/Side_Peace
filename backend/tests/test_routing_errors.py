@@ -9,6 +9,7 @@ from tests.app_helpers import make_app, make_client
     [
         ("GET", "/nope", 404, "not_found"),
         ("GET", "/sync", 405, "method_not_allowed"),
+        ("GET", "/query", 405, "method_not_allowed"),
         ("POST", "/health", 405, "method_not_allowed"),
     ],
 )
