@@ -3,13 +3,20 @@
 Artifact: Nazaar's Storage + Gateway code, frozen at a recorded commit SHA (fill in at planning).
 Roles: Moderator = Ammar, Author = Nazaar, Reader/Recorder = Nawal, plus one inspector from another team.
 
-## Planning record (fill in, do not guess)
+## Planning record
 | Item | Value |
 |---|---|
-| Frozen commit SHA | _TBD_ |
-| Files and line count | _TBD_ |
-| Meeting date | _TBD (week 9)_ |
-| Outside inspector | _TBD_ |
+| Frozen commit SHA | `e0192a5` (merge of PR #28 on `main`), announced by the Author (Nazaar) |
+| Roles | Moderator: Ammar Zahid; Author: Nazaar Khalid; Reader/Recorder: Nawal Jabeen; outside inspector: see below |
+| Scope (421 lines at the SHA, as listed by the Author) | `backend/database/sqlite_adapter.py` 108 (Singleton, lock and queue use; CAPA-01 area); `backend/database/write_queue.py` 49 (concurrency, REQ-Q05, Q06); `backend/database/session_manager.py` 27 (dependency injection); `backend/services/gemini_adapter.py` 64 (Adapter pattern, key handling, REQ-F02); `backend/api/error_handlers.py` 79 (error contract, REQ-Q02, Q08); `backend/api/query.py` 30 (`/query` route); `backend/api/sync.py` 16 (`/sync` route); `backend/api/schemas.py` 48 (validation, REQ-F05). Source: the Author's scope table; line counts are the Author's |
+| Not in scope | everything else, including `main.py`, `server.py`, `settings.py`, `errors.py`, `llm_provider.py`, `base.py`, `memory_adapter.py`, `dependencies.py`, `health.py`, and the Moderator's own modules (`context_pruner.py`, `prompt_factory.py`, the side panel) |
+| Preparation effort | about 150-200 lines/hour, so about 2-3 hours per inspector for 421 lines |
+| Meeting date | _TBD (to be booked; week 9)_ |
+| Outside inspector | _TBD (Nawal asked the instructor which team)_ |
+| Author's overview | to be sent by the Author before the meeting |
+
+### Known item declared by the Author before the inspection
+`settings.py` accepts non-ASCII digits (`isdigit()`): reported in the PR #28 review and fixed in PR #35 (separate branch, after the frozen SHA). It is outside the frozen scope, so it is not an inspection finding; it is listed here for traceability only.
 
 ## Checklist (answer Yes / No / N/A per file, cite file:line for every No)
 | # | Question | Defect type if No |
