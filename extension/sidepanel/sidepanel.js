@@ -1,5 +1,4 @@
-import { SidePanelController } from "./sidePanelController.js";
-import { checkServer } from "./serverStatus.js";
+import { initSidePanel } from "./initSidePanel.js";
 import { BACKEND_URL } from "../shared/constants.js";
 
 // Temporary stand-in until Nawal's ExtensionBridge is merged: it only has to
@@ -20,20 +19,4 @@ const fakeBridge = {
     ),
 };
 
-const controller = new SidePanelController(fakeBridge, {
-  input: document.getElementById("query"),
-  submitButton: document.getElementById("submit"),
-  messageArea: document.getElementById("message"),
-  answerArea: document.getElementById("answer"),
-});
-
-document.getElementById("query-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-  controller.handleUserSubmit();
-});
-
-const serverStatus = document.getElementById("server-status");
-checkServer(BACKEND_URL).then((isUp) => {
-  serverStatus.dataset.state = isUp ? "up" : "down";
-  serverStatus.textContent = isUp ? "Server: connected" : "Server: not running (demo answers only)";
-});
+initSidePanel({ document, bridge: fakeBridge, backendUrl: BACKEND_URL, fetchFn: fetch.bind(globalThis) });
