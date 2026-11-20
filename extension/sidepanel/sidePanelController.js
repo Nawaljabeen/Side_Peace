@@ -12,6 +12,9 @@ export class SidePanelController {
 
   async handleUserSubmit() {
     const text = this.input.value.trim();
+    const requestId = ++this.latestRequestId; // any submit invalidates a reply that is still in flight
+    this.answerArea.textContent = "";
+    this.submitButton.disabled = false; // nothing is in flight any more; a valid text disables it again below
     if (!text) {
       this.renderError("Please type a question.");
       return;
@@ -20,9 +23,7 @@ export class SidePanelController {
       this.renderError(`Question is too long (max ${MAX_QUERY_LENGTH} characters).`);
       return;
     }
-    const requestId = ++this.latestRequestId;
     this.messageArea.textContent = "";
-    this.answerArea.textContent = "";
     this.submitButton.disabled = true;
     try {
       const answer = await this.bridge.sendQuery(text);
