@@ -1,0 +1,154 @@
+<div class="conversation-container message-actions-hover-boundary" id="fixture-conversation-1">
+  <user-query class="ng-star-inserted">
+    <span class="user-query-container">
+      <user-query-content class="user-query-container enable-rich-query-formatting">
+        <div class="user-query-container">
+          <div class="query-content" id="user-query-content-1">
+            <div class="query-bubble-anchor">
+              <span class="user-query-bubble-with-background">
+                <span class="horizontal-container">
+                  <div class="query-text gds-body-l" dir="ltr">
+                    <h5 class="cdk-visually-hidden screen-reader-user-query-label"><span>You said</span> Explain how a debouncer works in two sentences.</h5>
+                    <p dir="auto" class="query-text-line"><span>Explain how a debouncer works in two sentences.</span></p>
+                  </div>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </user-query-content>
+    </span>
+  </user-query>
+  <model-response class="enable-lr26-response-chrome-updates ng-star-inserted">
+    <div>
+      <response-container class="reduced-bottom-padding ng-star-inserted">
+        <div class="response-container response-container-with-gpi no-background">
+          <div class="presented-response-container">
+            <div class="response-container-content">
+              <div class="response-content">
+                <div class="model-response-label-announcer" aria-busy="false" aria-live="polite">
+                  <h6 class="cdk-visually-hidden screen-reader-model-response-label"> Gemini said </h6>
+                </div>
+                <model-response-content>
+                  <div class="collapsible-content-wrapper">
+                    <structured-content-container class="model-response-text">
+                      <div class="container">
+                        <message-content id="message-content-id-fixture-1">
+                          <div class="markdown markdown-main-panel md-content" aria-busy="false" aria-live="polite" dir="ltr">
+<p dir="ltr">A debouncer waits until calls stop arriving, then runs the callback once with the latest value.</p>
+<h3 dir="ltr">Example (<code>debounce.js</code>)</h3>
+<response-element class="no-md md-has-block-component">
+  <code-block class="enable-luminous-code-block">
+    <div class="code-block">
+      <div class="formatted-code-block-internal-container">
+        <div class="animated-opacity">
+          <div class="code-block-decoration header-formatted gds-emphasized-body-m"><span>JavaScript</span><div class="buttons"><button aria-label="Copy code"></button></div></div>
+        </div>
+        <pre><code role="text" data-test-id="code-content" class="code-container formatted"><span class="hljs-keyword">function</span> <span class="hljs-title">debounce</span>(fn, ms) {
+  <span class="hljs-keyword">let</span> id;
+  <span class="hljs-keyword">return</span> (...args) =&gt; {
+    clearTimeout(id);
+    id = setTimeout(() =&gt; fn(...args), ms);
+  };
+}
+</code></pre>
+      </div>
+    </div>
+  </code-block>
+</response-element>
+                          </div>
+                        </message-content>
+                      </div>
+                    </structured-content-container>
+                  </div>
+                </model-response-content>
+                <div class="response-footer complete gap">
+                  <sources-list class="sources-list"></sources-list>
+                </div>
+              </div>
+            </div>
+            <div class="response-container-footer">
+              <message-actions class="hide-on-print">
+                <div class="actions-container-v2"><button aria-label="Good response"></button><button aria-label="Copy"></button></div>
+              </message-actions>
+            </div>
+          </div>
+        </div>
+      </response-container>
+    </div>
+  </model-response>
+  <model-response-disclaimers>
+    <hallucination-disclaimer class="hallucination-disclaimer">
+      <div class="capabilities-disclaimer"><p class="gds-body-s"> Gemini is AI and can make mistakes. </p></div>
+    </hallucination-disclaimer>
+  </model-response-disclaimers>
+</div>
+<div class="conversation-container message-actions-hover-boundary" id="fixture-conversation-2">
+  <user-query class="ng-star-inserted">
+    <span class="user-query-container">
+      <user-query-content class="user-query-container enable-rich-query-formatting">
+        <div class="user-query-container">
+          <div class="query-content" id="user-query-content-2">
+            <div class="query-bubble-anchor">
+              <span class="user-query-bubble-with-background">
+                <span class="horizontal-container">
+                  <div class="query-text gds-body-l" dir="ltr">
+                    <h5 class="cdk-visually-hidden screen-reader-user-query-label"><span>You said</span> What does clearTimeout do?</h5>
+                    <p dir="auto" class="query-text-line"><span>What does clearTimeout do?</span></p>
+                  </div>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </user-query-content>
+    </span>
+  </user-query>
+  <model-response class="enable-lr26-response-chrome-updates ng-star-inserted">
+    <div>
+      <response-container class="reduced-bottom-padding ng-star-inserted">
+        <div class="response-container response-container-with-gpi no-background">
+          <div class="presented-response-container">
+            <div class="response-container-content">
+              <div class="response-content">
+                <div class="model-response-label-announcer" aria-busy="false" aria-live="polite">
+                  <h6 class="cdk-visually-hidden screen-reader-model-response-label"> Gemini said </h6>
+                </div>
+                <model-response-content>
+                  <div class="collapsible-content-wrapper">
+                    <structured-content-container class="model-response-text">
+                      <div class="container">
+                        <message-content id="message-content-id-fixture-2">
+                          <div class="markdown markdown-main-panel md-content" aria-busy="false" aria-live="polite" dir="ltr">
+<p dir="ltr">It cancels a timer created earlier with setTimeout, so the callback never runs.</p>
+<ul>
+  <li><p dir="ltr">Pass the id returned by setTimeout.</p></li>
+  <li><p dir="ltr">Calling it with an unknown id does nothing.</p></li>
+</ul>
+                          </div>
+                        </message-content>
+                      </div>
+                    </structured-content-container>
+                  </div>
+                </model-response-content>
+                <div class="response-footer complete gap">
+                  <sources-list class="sources-list"></sources-list>
+                </div>
+              </div>
+            </div>
+            <div class="response-container-footer">
+              <message-actions class="hide-on-print">
+                <div class="actions-container-v2"><button aria-label="Good response"></button><button aria-label="Copy"></button></div>
+              </message-actions>
+            </div>
+          </div>
+        </div>
+      </response-container>
+    </div>
+  </model-response>
+  <model-response-disclaimers>
+    <hallucination-disclaimer class="hallucination-disclaimer">
+      <div class="capabilities-disclaimer"><p class="gds-body-s"> Gemini is AI and can make mistakes. </p></div>
+    </hallucination-disclaimer>
+  </model-response-disclaimers>
+</div>
