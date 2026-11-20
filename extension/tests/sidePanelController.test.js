@@ -197,3 +197,18 @@ describe("SidePanelController re-enables Ask after a rejected submit (REQ-F04)",
     expect(elements.submitButton.disabled).toBe(false);
   });
 });
+
+describe("SidePanelController keeps the typed text after a rejected submit (REQ-F04)", () => {
+  it("leaves the text in the input when it is empty-after-trim or too long, so the user can fix it", async () => {
+    const controller = new SidePanelController(bridge, elements);
+
+    elements.input.value = "x".repeat(MAX_QUERY_LENGTH + 1);
+    await controller.handleUserSubmit();
+    expect(elements.input.value).toBe("x".repeat(MAX_QUERY_LENGTH + 1));
+
+    elements.input.value = "   ";
+    await controller.handleUserSubmit();
+    expect(elements.input.value).toBe("   ");
+    expect(bridge.sendQuery).not.toHaveBeenCalled();
+  });
+});
