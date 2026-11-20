@@ -132,3 +132,68 @@ describe("SidePanelController clears old answers (REQ-F04)", () => {
     expect(elements.messageArea.textContent).toMatch(/could not reach/i);
   });
 });
+
+describe("SidePanelController clears the answer on every submit (REQ-F04)", () => {
+  it("removes the previous answer when the next input is empty", async () => {
+    const controller = new SidePanelController(bridge, elements);
+    elements.input.value = "first";
+    await controller.handleUserSubmit();
+    expect(elements.answerArea.textContent).toBe("canned answer");
+
+    elements.input.value = "   ";
+    await controller.handleUserSubmit();
+    expect(elements.answerArea.textContent).toBe("");
+    expect(elements.messageArea.textContent).toMatch(/type a question/i);
+  });
+
+  it("removes the previous answer when the next input is too long", async () => {
+    const controller = new SidePanelController(bridge, elements);
+    elements.input.value = "first";
+    await controller.handleUserSubmit();
+
+    elements.input.value = "x".repeat(MAX_QUERY_LENGTH + 1);
+    await controller.handleUserSubmit();
+    expect(elements.answerArea.textContent).toBe("");
+    expect(elements.messageArea.textContent).toMatch(/too long/i);
+  });
+});
+
+describe("SidePanelController ignores a pending reply after a rejected submit (REQ-F04)", () => {
+  it("does not show a late answer once an empty submit has cleared the panel", async () => {
+    const pending = deferred();
+    bridge.sendQuery.mockReturnValue(pending.promise);
+    const controller = new SidePanelController(bridge, elements);
+
+    elements.input.value = "slow question";
+    const firstSubmission = controller.handleUserSubmit();
+
+    elements.input.value = "";
+    await controller.handleUserSubmit();
+
+    pending.resolve("late answer");
+    await firstSubmission;
+
+    expect(elements.answerArea.textContent).toBe("");
+    expect(elements.messageArea.textContent).toMatch(/type a question/i);
+  });
+});
+
+describe("SidePanelController re-enables Ask after a rejected submit (REQ-F04)", () => {
+  it("does not leave the button disabled when a pending request was invalidated", async () => {
+    const pending = deferred();
+    bridge.sendQuery.mockReturnValue(pending.promise);
+    const controller = new SidePanelController(bridge, elements);
+
+    elements.input.value = "slow question";
+    const firstSubmission = controller.handleUserSubmit();
+    expect(elements.submitButton.disabled).toBe(true);
+
+    elements.input.value = "";
+    await controller.handleUserSubmit();
+    expect(elements.submitButton.disabled).toBe(false);
+
+    pending.resolve("late answer");
+    await firstSubmission;
+    expect(elements.submitButton.disabled).toBe(false);
+  });
+});
