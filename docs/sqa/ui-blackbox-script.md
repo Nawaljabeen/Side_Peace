@@ -17,7 +17,7 @@ Run 2026-11-19, Chrome 157 (automated, headless), extension loaded unpacked from
 | 2 | Click Ask with empty box | "Please type a question."; no request | Pass | screenshots/2-validation-error.png |
 | 3 | Enter question, click Ask | Ask disabled while loading | Pass | screenshots/3-loading.png |
 | 4 | Wait for reply | Answer shown as text; button enabled | Pass | screenshots/4-answer.png |
-| 5 | Enter 2001 characters, click Ask | "too long" message, no request | Pass; note the previous answer stays visible below the validation message (design choice, flag to the team) | screenshots/5-too-long-validation.png |
+| 5 | Enter 2001 characters, click Ask | "too long" message, no request | Pass (at the time the previous answer stayed visible below the message; decided later: every submit now clears the previous answer, see PR on `feature/panel-clear-on-submit`) | screenshots/5-too-long-validation.png |
 | 6 | Bridge failing (harness only) | Friendly error, old answer cleared | Pass after fix f04b9b6 | screenshots/6-network-error-harness.png |
 
 Defect found by this script: the previous answer stayed visible next to a network error. Fixed test-first (commits 63d4542, f04b9b6, PR #21).
