@@ -1,9 +1,10 @@
-import { BACKEND_URL } from "../shared/constants.js";
+import { BACKEND_URL, MAX_QUERY_LENGTH, MAX_TURN_TEXT_LENGTH, SESSION_ID_PATTERN } from "../shared/constants.js";
 import { NetworkError, ServerError, ValidationError } from "../shared/errors.js";
 
 export const DEFAULT_TIMEOUT_MS = 20000;
 export const DEFAULT_RETRY_DELAY_MS = 500;
 
+const ROLES = ["user", "model"];
 const UNREACHABLE = "Could not reach the SidePeace server. Is it running?";
 const UNEXPECTED = "The SidePeace server returned an unexpected response.";
 
@@ -48,6 +49,8 @@ export class ExtensionBridge {
 
   /** Ask a side question (POST /query). Resolves to the answer text. */
   async sendQuery(sessionId, text) {
+    assertValidSessionId(sessionId);
+    assertValidQuery(text);
     const body = await this.#post("/query", { session_id: sessionId, text });
     if (typeof body?.answer !== "string" || body.answer.trim() === "") {
       throw badResponse();
@@ -57,6 +60,8 @@ export class ExtensionBridge {
 
   /** Save one finished chat turn (POST /sync). Resolves to the number of turns the backend now holds. */
   async syncTurn(sessionId, turn) {
+    assertValidSessionId(sessionId);
+    assertValidTurn(turn);
     const { index, role, text } = turn;
     const body = await this.#post("/sync", { session_id: sessionId, turn: { index, role, text } });
     if (body?.status !== "ok" || !Number.isInteger(body.turn_count) || body.turn_count < 0) {
@@ -106,4 +111,31 @@ function errorForStatus(status, body) {
     return new ValidationError(message, { code });
   }
   return new ServerError(message, { status, code });
+}
+
+function assertValidSessionId(sessionId) {
+  if (typeof sessionId !== "string" || !SESSION_ID_PATTERN.test(sessionId)) {
+    throw new ValidationError("The session id must be 1-64 characters: letters, digits, _ or -.");
+  }
+}
+
+function assertValidQuery(text) {
+  if (typeof text !== "string" || text.trim() === "" || text.length > MAX_QUERY_LENGTH) {
+    throw new ValidationError(`A question needs 1-${MAX_QUERY_LENGTH} characters of text.`);
+  }
+}
+
+function assertValidTurn(turn) {
+  const valid =
+    turn !== null &&
+    typeof turn === "object" &&
+    Number.isInteger(turn.index) &&
+    turn.index >= 0 &&
+    ROLES.includes(turn.role) &&
+    typeof turn.text === "string" &&
+    turn.text.length >= 1 &&
+    turn.text.length <= MAX_TURN_TEXT_LENGTH;
+  if (!valid) {
+    throw new ValidationError(`A turn needs an index of 0 or more, a role (user or model) and 1-${MAX_TURN_TEXT_LENGTH} characters of text.`);
+  }
 }
