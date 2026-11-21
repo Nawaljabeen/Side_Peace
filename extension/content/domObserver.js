@@ -97,6 +97,11 @@ export class DOMObserver {
     return turns.length > 0 ? turns[turns.length - 1] : null;
   }
 
+  /** Forget what was already reported, so the next scan reports every turn again. */
+  reset() {
+    this.#lastTextByIndex.clear();
+  }
+
   /** Read the page and notify subscribers about every turn that is new or changed. */
   scan() {
     for (const turn of parseTurns(this.#root, this.#selectors)) {
