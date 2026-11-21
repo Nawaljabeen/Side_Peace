@@ -104,13 +104,32 @@ export class DOMObserver {
 
   /** Read the page and notify subscribers about every turn that is new or changed. */
   scan() {
-    for (const turn of parseTurns(this.#root, this.#selectors)) {
+    const turns = parseTurns(this.#root, this.#selectors);
+    if (this.#isDifferentConversation(turns)) {
+      this.reset();
+    }
+    for (const turn of turns) {
       if (this.#lastTextByIndex.get(turn.index) === turn.text) {
         continue;
       }
       this.#lastTextByIndex.set(turn.index, turn.text);
       this.#notify(turn);
     }
+  }
+
+  /**
+   * Streaming only ever adds turns or changes the newest one. If the page now has fewer turns, or an
+   * earlier turn has different text, the user moved to another chat (Gemini is a single-page app).
+   */
+  #isDifferentConversation(turns) {
+    if (this.#lastTextByIndex.size === 0 || turns.length === 0) {
+      return false;
+    }
+    const lastKnownIndex = Math.max(...this.#lastTextByIndex.keys());
+    if (turns[turns.length - 1].index < lastKnownIndex) {
+      return true;
+    }
+    return turns.some((turn) => turn.index < lastKnownIndex && this.#lastTextByIndex.get(turn.index) !== turn.text);
   }
 
   /** scan() for timer/startup paths, where nobody can catch an exception. */
