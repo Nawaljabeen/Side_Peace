@@ -3,8 +3,10 @@ import { NetworkError, ServerError, ValidationError } from "../shared/errors.js"
 
 export const DEFAULT_TIMEOUT_MS = 20000;
 export const DEFAULT_RETRY_DELAY_MS = 500;
+export const SYNC_ATTEMPTS = 3; // the first try plus two retries
 
 const ROLES = ["user", "model"];
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const TOO_SLOW = "The SidePeace server took too long to answer.";
 const UNREACHABLE = "Could not reach the SidePeace server. Is it running?";
 const UNEXPECTED = "The SidePeace server returned an unexpected response.";
@@ -19,6 +21,7 @@ export class ExtensionBridge {
   #baseUrl;
   #fetchFn;
   #timeoutMs;
+  #retryDelayMs;
 
   /**
    * @param {object} [options]
@@ -48,6 +51,7 @@ export class ExtensionBridge {
     this.#baseUrl = baseUrl.trim().replace(/\/+$/, "");
     this.#fetchFn = fetchFn;
     this.#timeoutMs = timeoutMs;
+    this.#retryDelayMs = retryDelayMs;
   }
 
   /** Ask a side question (POST /query). Resolves to the answer text. */
@@ -66,11 +70,28 @@ export class ExtensionBridge {
     assertValidSessionId(sessionId);
     assertValidTurn(turn);
     const { index, role, text } = turn;
-    const body = await this.#post("/sync", { session_id: sessionId, turn: { index, role, text } });
+    const body = await this.#postWithRetry("/sync", { session_id: sessionId, turn: { index, role, text } });
     if (body?.status !== "ok" || !Number.isInteger(body.turn_count) || body.turn_count < 0) {
       throw badResponse();
     }
     return body.turn_count;
+  }
+
+  // Only /sync is retried: DOMObserver reports a finished turn once, so a lost sync would never be sent again.
+  // A side question is never retried (the user is waiting and it would cost a second model call).
+  async #postWithRetry(path, payload) {
+    let delay = this.#retryDelayMs;
+    for (let attempt = 1; ; attempt += 1) {
+      try {
+        return await this.#post(path, payload);
+      } catch (error) {
+        if (attempt >= SYNC_ATTEMPTS || !isTemporary(error)) {
+          throw error;
+        }
+        await sleep(delay);
+        delay *= 2;
+      }
+    }
   }
 
   async #post(path, payload) {
@@ -117,6 +138,15 @@ export class ExtensionBridge {
       throw new NetworkError(UNREACHABLE, { cause });
     }
   }
+}
+
+// Worth another try when waiting might fix it: no connection, a timeout, a busy or broken server.
+// A 422 or any other refusal is never retried because the same turn would be refused again.
+function isTemporary(error) {
+  if (error instanceof NetworkError) {
+    return true;
+  }
+  return error instanceof ServerError && (error.status === 429 || error.status >= 500);
 }
 
 function badResponse() {
