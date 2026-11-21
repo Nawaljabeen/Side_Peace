@@ -37,4 +37,27 @@ describe("manifest.json", () => {
     ];
     for (const f of files) expect(existsSync(join(root, f)), f).toBe(true);
   });
+
+  // The content script loads its modules with a dynamic import, which needs web_accessible_resources.
+  // QR-03: they may be exposed to gemini.google.com only, never to every site.
+  it("exposes the content-script modules only to Gemini (QR-03)", () => {
+    const entries = manifest.web_accessible_resources ?? [];
+    expect(entries.length).toBeGreaterThan(0);
+    for (const entry of entries) {
+      expect(entry.matches).toEqual([GEMINI]);
+      expect(entry.extension_ids).toBeUndefined();
+    }
+    const exposed = entries.flatMap((entry) => entry.resources);
+    expect(exposed).toContain("content/contentScript.js");
+    expect(exposed).not.toContain("*");
+    expect(exposed.every((r) => r.startsWith("content/") || r.startsWith("shared/"))).toBe(true);
+  });
+
+  it("only exposes files that exist", () => {
+    for (const entry of manifest.web_accessible_resources ?? []) {
+      for (const resource of entry.resources) {
+        if (!resource.includes("*")) expect(existsSync(join(root, resource)), resource).toBe(true);
+      }
+    }
+  });
 });
