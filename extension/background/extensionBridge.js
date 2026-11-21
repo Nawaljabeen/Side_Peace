@@ -2,8 +2,9 @@
 // It lives in the service worker. Everything else (content script, side panel) asks it through
 // chrome.runtime messages, so there is no raw fetch anywhere else and no API key in the client.
 import { NetworkError, ValidationError, ServerError } from "../shared/errors.js";
+import { BACKEND_URL } from "../shared/constants.js";
 
-export const DEFAULT_BASE_URL = "http://localhost:8000";
+export const DEFAULT_BASE_URL = BACKEND_URL; // one source for the backend address
 export const DEFAULT_TIMEOUT_MS = 20000;
 
 export class ExtensionBridge {
