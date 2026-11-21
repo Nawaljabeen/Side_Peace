@@ -5,6 +5,7 @@ export const DEFAULT_TIMEOUT_MS = 20000;
 export const DEFAULT_RETRY_DELAY_MS = 500;
 
 const ROLES = ["user", "model"];
+const TOO_SLOW = "The SidePeace server took too long to answer.";
 const UNREACHABLE = "Could not reach the SidePeace server. Is it running?";
 const UNEXPECTED = "The SidePeace server returned an unexpected response.";
 
@@ -17,6 +18,7 @@ const UNEXPECTED = "The SidePeace server returned an unexpected response.";
 export class ExtensionBridge {
   #baseUrl;
   #fetchFn;
+  #timeoutMs;
 
   /**
    * @param {object} [options]
@@ -45,6 +47,7 @@ export class ExtensionBridge {
     }
     this.#baseUrl = baseUrl.trim().replace(/\/+$/, "");
     this.#fetchFn = fetchFn;
+    this.#timeoutMs = timeoutMs;
   }
 
   /** Ask a side question (POST /query). Resolves to the answer text. */
@@ -71,22 +74,48 @@ export class ExtensionBridge {
   }
 
   async #post(path, payload) {
-    let response;
-    try {
-      response = await this.#fetchFn(`${this.#baseUrl}${path}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "omit",
-        body: JSON.stringify(payload),
-      });
-    } catch (cause) {
-      throw new NetworkError(UNREACHABLE, { cause });
-    }
-    const body = await readJson(response);
+    const { response, body } = await this.#withTimeLimit((signal) => this.#exchange(path, payload, signal));
     if (response.ok) {
       return body;
     }
     throw errorForStatus(response.status, body);
+  }
+
+  // One time limit for the whole exchange (waiting for the response AND reading its body). When it passes the
+  // request is aborted and the caller gets a NetworkError with timedOut set. The timer is always cleared, so
+  // nothing is left running that would keep the service worker awake.
+  async #withTimeLimit(work) {
+    const controller = new AbortController();
+    let timer;
+    const deadline = new Promise((_resolve, reject) => {
+      timer = setTimeout(() => {
+        controller.abort();
+        reject(new NetworkError(TOO_SLOW, { timedOut: true }));
+      }, this.#timeoutMs);
+    });
+    try {
+      return await Promise.race([work(controller.signal), deadline]);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async #exchange(path, payload, signal) {
+    try {
+      const response = await this.#fetchFn(`${this.#baseUrl}${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "omit",
+        body: JSON.stringify(payload),
+        signal,
+      });
+      return { response, body: await readJson(response) };
+    } catch (cause) {
+      if (cause?.name === "AbortError") {
+        throw new NetworkError(TOO_SLOW, { timedOut: true, cause });
+      }
+      throw new NetworkError(UNREACHABLE, { cause });
+    }
   }
 }
 
@@ -94,12 +123,16 @@ function badResponse() {
   return new ServerError(UNEXPECTED, { code: "bad_response" });
 }
 
-// The parsed JSON body, or undefined when the body is missing or is not JSON.
+// The parsed JSON body, or undefined when the body is not valid JSON. Any other failure (for example a
+// connection that drops half way through the body) is rethrown and becomes a NetworkError.
 async function readJson(response) {
   try {
     return await response.json();
-  } catch {
-    return undefined;
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return undefined;
+    }
+    throw error;
   }
 }
 
