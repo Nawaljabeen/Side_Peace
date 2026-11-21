@@ -77,6 +77,16 @@ export class ExtensionBridge {
     return body.turn_count;
   }
 
+  /** True when GET /health answers {status: "ok"}. Never throws: any problem means "not healthy". */
+  async checkHealth() {
+    try {
+      const { response, body } = await this.#withTimeLimit((signal) => this.#exchange("/health", { method: "GET" }, signal));
+      return response.ok && body?.status === "ok";
+    } catch {
+      return false;
+    }
+  }
+
   // Only /sync is retried: DOMObserver reports a finished turn once, so a lost sync would never be sent again.
   // A side question is never retried (the user is waiting and it would cost a second model call).
   async #postWithRetry(path, payload) {
@@ -95,7 +105,12 @@ export class ExtensionBridge {
   }
 
   async #post(path, payload) {
-    const { response, body } = await this.#withTimeLimit((signal) => this.#exchange(path, payload, signal));
+    const options = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    };
+    const { response, body } = await this.#withTimeLimit((signal) => this.#exchange(path, options, signal));
     if (response.ok) {
       return body;
     }
@@ -121,15 +136,9 @@ export class ExtensionBridge {
     }
   }
 
-  async #exchange(path, payload, signal) {
+  async #exchange(path, options, signal) {
     try {
-      const response = await this.#fetchFn(`${this.#baseUrl}${path}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "omit",
-        body: JSON.stringify(payload),
-        signal,
-      });
+      const response = await this.#fetchFn(`${this.#baseUrl}${path}`, { ...options, credentials: "omit", signal });
       return { response, body: await readJson(response) };
     } catch (cause) {
       if (cause?.name === "AbortError") {
@@ -140,8 +149,6 @@ export class ExtensionBridge {
   }
 }
 
-// Worth another try when waiting might fix it: no connection, a timeout, a busy or broken server.
-// A 422 or any other refusal is never retried because the same turn would be refused again.
 function isTemporary(error) {
   if (error instanceof NetworkError) {
     return true;
