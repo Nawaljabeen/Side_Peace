@@ -72,3 +72,23 @@ describe("DOMObserver notices a replaced conversation (REQ-F01)", () => {
     expect(reported()).toEqual(["0:user:a", "1:model:b"]);
   });
 });
+
+describe("DOMObserver does not reset while a chat streams (REQ-F01)", () => {
+  it("reports only the growing last turn and only the new turn, never the earlier ones again", () => {
+    document.body.innerHTML = '<div id="chat"></div>';
+    const root = document.getElementById("chat");
+    const listener = vi.fn();
+    const observer = new DOMObserver(root);
+    observer.subscribe(listener);
+    const reported = () => listener.mock.calls.map(([turn]) => `${turn.index}:${turn.text}`);
+
+    root.innerHTML = chat([["user", "q1"], ["model", "par"]]);
+    observer.scan();
+    root.innerHTML = chat([["user", "q1"], ["model", "partial answer"]]);
+    observer.scan();
+    root.innerHTML = chat([["user", "q1"], ["model", "partial answer"], ["user", "q2"]]);
+    observer.scan();
+
+    expect(reported()).toEqual(["0:q1", "1:par", "1:partial answer", "2:q2"]);
+  });
+});
