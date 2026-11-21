@@ -118,8 +118,10 @@ export class DOMObserver {
   }
 
   /**
-   * Streaming only ever adds turns or changes the newest one. If the page now has fewer turns, or an
-   * earlier turn has different text, the user moved to another chat (Gemini is a single-page app).
+   * Streaming only adds turns or makes the newest turn longer (its text starts with what was seen).
+   * Fewer turns, an earlier turn with different text, or a newest turn that was replaced instead of
+   * extended means the user moved to another chat (Gemini is a single-page app). A false alarm only
+   * costs a repeated /sync, which is idempotent; a missed one would lose turn 0.
    */
   #isDifferentConversation(turns) {
     if (this.#lastTextByIndex.size === 0 || turns.length === 0) {
@@ -129,7 +131,14 @@ export class DOMObserver {
     if (turns[turns.length - 1].index < lastKnownIndex) {
       return true;
     }
-    return turns.some((turn) => turn.index < lastKnownIndex && this.#lastTextByIndex.get(turn.index) !== turn.text);
+    return turns.some((turn) => {
+      const seen = this.#lastTextByIndex.get(turn.index);
+      if (seen === undefined || seen === turn.text) {
+        return false;
+      }
+      const isNewestTurnGrowing = turn.index === lastKnownIndex && turn.text.startsWith(seen);
+      return !isNewestTurnGrowing;
+    });
   }
 
   /** scan() for timer/startup paths, where nobody can catch an exception. */
