@@ -34,3 +34,41 @@ describe("DOMObserver reset (REQ-F01)", () => {
     expect(reported()).toEqual(["0:user:hello", "1:model:hi there"]);
   });
 });
+
+describe("DOMObserver notices a replaced conversation (REQ-F01)", () => {
+  let root;
+  let listener;
+  let observer;
+
+  beforeEach(() => {
+    document.body.innerHTML = '<div id="chat"></div>';
+    root = document.getElementById("chat");
+    listener = vi.fn();
+    observer = new DOMObserver(root);
+    observer.subscribe(listener);
+  });
+
+  const reported = () => listener.mock.calls.map(([turn]) => `${turn.index}:${turn.role}:${turn.text}`);
+
+  it("reports turn 0 again when a new chat starts with the same first question", () => {
+    root.innerHTML = chat([["user", "hello"], ["model", "hi there"]]);
+    observer.scan();
+    listener.mockClear();
+
+    root.innerHTML = chat([["user", "hello"], ["model", "a different answer"]]);
+    observer.scan();
+
+    expect(reported()).toEqual(["0:user:hello", "1:model:a different answer"]);
+  });
+
+  it("reports everything again when the new chat is shorter than the old one", () => {
+    root.innerHTML = chat([["user", "a"], ["model", "b"], ["user", "c"], ["model", "d"]]);
+    observer.scan();
+    listener.mockClear();
+
+    root.innerHTML = chat([["user", "a"], ["model", "b"]]);
+    observer.scan();
+
+    expect(reported()).toEqual(["0:user:a", "1:model:b"]);
+  });
+});
