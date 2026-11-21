@@ -16,6 +16,20 @@
       "run_at": "document_idle"
     }
   ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content/domObserver.js",
+        "content/main.js",
+        "content/selectors.js",
+        "content/textDebouncer.js",
+        "content/turnParser.js",
+        "content/turnRelay.js",
+        "shared/constants.js"
+      ],
+      "matches": ["https://gemini.google.com/*"]
+    }
+  ],
   "side_panel": {
     "default_path": "sidepanel/sidepanel.html"
   },
