@@ -1,4 +1,4 @@
+// Service worker entry point. All logic lives in serviceWorkerSetup.js and extensionBridge.js (tested).
+import { setUpServiceWorker } from "./serviceWorkerSetup.js";
 
-chrome.sidePanel
-  .setPanelBehavior({ openPanelOnActionClick: true })
-  .catch((error) => console.error("SidePeace: could not set side panel behaviour", error));
+setUpServiceWorker(chrome);
