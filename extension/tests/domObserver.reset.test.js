@@ -1,0 +1,94 @@
+// REQ-F01: Gemini is a single-page app, so one DOMObserver lives across several chats.
+// When the page shows a different conversation, every turn must be reported again so the
+// new session receives it from turn 0 (found by review: turn 0 was silently skipped).
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { DOMObserver } from "../content/domObserver.js";
+
+const userTurn = (text) => `<user-query><p class="query-text-line">${text}</p></user-query>`;
+const modelTurn = (text) => `<model-response><message-content><div class="markdown"><p>${text}</p></div></message-content></model-response>`;
+const chat = (turns) => turns.map(([role, text]) => (role === "user" ? userTurn(text) : modelTurn(text))).join("");
+
+describe("DOMObserver reset (REQ-F01)", () => {
+  let root;
+  let listener;
+  let observer;
+
+  beforeEach(() => {
+    document.body.innerHTML = '<div id="chat"></div>';
+    root = document.getElementById("chat");
+    listener = vi.fn();
+    observer = new DOMObserver(root);
+    observer.subscribe(listener);
+  });
+
+  const reported = () => listener.mock.calls.map(([turn]) => `${turn.index}:${turn.role}:${turn.text}`);
+
+  it("reset() makes the next scan report every turn again", () => {
+    root.innerHTML = chat([["user", "hello"], ["model", "hi there"]]);
+    observer.scan();
+    listener.mockClear();
+
+    observer.reset();
+    observer.scan();
+
+    expect(reported()).toEqual(["0:user:hello", "1:model:hi there"]);
+  });
+});
+
+describe("DOMObserver notices a replaced conversation (REQ-F01)", () => {
+  let root;
+  let listener;
+  let observer;
+
+  beforeEach(() => {
+    document.body.innerHTML = '<div id="chat"></div>';
+    root = document.getElementById("chat");
+    listener = vi.fn();
+    observer = new DOMObserver(root);
+    observer.subscribe(listener);
+  });
+
+  const reported = () => listener.mock.calls.map(([turn]) => `${turn.index}:${turn.role}:${turn.text}`);
+
+  it("reports turn 0 again when a new chat starts with the same first question", () => {
+    root.innerHTML = chat([["user", "hello"], ["model", "hi there"]]);
+    observer.scan();
+    listener.mockClear();
+
+    root.innerHTML = chat([["user", "hello"], ["model", "a different answer"]]);
+    observer.scan();
+
+    expect(reported()).toEqual(["0:user:hello", "1:model:a different answer"]);
+  });
+
+  it("reports everything again when the new chat is shorter than the old one", () => {
+    root.innerHTML = chat([["user", "a"], ["model", "b"], ["user", "c"], ["model", "d"]]);
+    observer.scan();
+    listener.mockClear();
+
+    root.innerHTML = chat([["user", "a"], ["model", "b"]]);
+    observer.scan();
+
+    expect(reported()).toEqual(["0:user:a", "1:model:b"]);
+  });
+});
+
+describe("DOMObserver does not reset while a chat streams (REQ-F01)", () => {
+  it("reports only the growing last turn and only the new turn, never the earlier ones again", () => {
+    document.body.innerHTML = '<div id="chat"></div>';
+    const root = document.getElementById("chat");
+    const listener = vi.fn();
+    const observer = new DOMObserver(root);
+    observer.subscribe(listener);
+    const reported = () => listener.mock.calls.map(([turn]) => `${turn.index}:${turn.text}`);
+
+    root.innerHTML = chat([["user", "q1"], ["model", "par"]]);
+    observer.scan();
+    root.innerHTML = chat([["user", "q1"], ["model", "partial answer"]]);
+    observer.scan();
+    root.innerHTML = chat([["user", "q1"], ["model", "partial answer"], ["user", "q2"]]);
+    observer.scan();
+
+    expect(reported()).toEqual(["0:q1", "1:par", "1:partial answer", "2:q2"]);
+  });
+});

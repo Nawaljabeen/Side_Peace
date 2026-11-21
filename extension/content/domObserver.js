@@ -97,15 +97,48 @@ export class DOMObserver {
     return turns.length > 0 ? turns[turns.length - 1] : null;
   }
 
+  /** Forget what was already reported, so the next scan reports every turn again. */
+  reset() {
+    this.#lastTextByIndex.clear();
+  }
+
   /** Read the page and notify subscribers about every turn that is new or changed. */
   scan() {
-    for (const turn of parseTurns(this.#root, this.#selectors)) {
+    const turns = parseTurns(this.#root, this.#selectors);
+    if (this.#isDifferentConversation(turns)) {
+      this.reset();
+    }
+    for (const turn of turns) {
       if (this.#lastTextByIndex.get(turn.index) === turn.text) {
         continue;
       }
       this.#lastTextByIndex.set(turn.index, turn.text);
       this.#notify(turn);
     }
+  }
+
+  /**
+   * Streaming only adds turns or makes the newest turn longer (its text starts with what was seen).
+   * Fewer turns, an earlier turn with different text, or a newest turn that was replaced instead of
+   * extended means the user moved to another chat (Gemini is a single-page app). A false alarm only
+   * costs a repeated /sync, which is idempotent; a missed one would lose turn 0.
+   */
+  #isDifferentConversation(turns) {
+    if (this.#lastTextByIndex.size === 0 || turns.length === 0) {
+      return false;
+    }
+    const lastKnownIndex = Math.max(...this.#lastTextByIndex.keys());
+    if (turns[turns.length - 1].index < lastKnownIndex) {
+      return true;
+    }
+    return turns.some((turn) => {
+      const seen = this.#lastTextByIndex.get(turn.index);
+      if (seen === undefined || seen === turn.text) {
+        return false;
+      }
+      const isNewestTurnGrowing = turn.index === lastKnownIndex && turn.text.startsWith(seen);
+      return !isNewestTurnGrowing;
+    });
   }
 
   /** scan() for timer/startup paths, where nobody can catch an exception. */
