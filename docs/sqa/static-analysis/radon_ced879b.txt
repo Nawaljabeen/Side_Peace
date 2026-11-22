@@ -1,0 +1,100 @@
+backend/main.py
+    F 26:0 create_app - A (2)
+backend/errors.py
+    C 4:0 SidePeaceError - A (1)
+    C 8:0 StorageError - A (1)
+    C 11:0 ProviderError - A (1)
+    C 15:0 ProviderTimeoutError - A (1)
+    C 19:0 ProviderRateLimitError - A (1)
+    C 23:0 ProviderBadResponseError - A (1)
+    C 27:0 ConfigError - A (1)
+backend/settings.py
+    F 28:0 load_env_file - C (11)
+    F 60:0 load_settings - B (6)
+    F 51:0 _positive_int - A (5)
+    C 20:0 Settings - A (1)
+backend/server.py
+    F 36:0 main - A (2)
+    F 25:0 build_production_app - A (1)
+backend/database/memory_adapter.py
+    C 6:0 InMemoryAdapter - A (2)
+    M 12:4 InMemoryAdapter.get_turns - A (2)
+    M 9:4 InMemoryAdapter.__init__ - A (1)
+    M 16:4 InMemoryAdapter.add_turn - A (1)
+backend/database/base.py
+    C 11:0 MessageReader - A (2)
+    C 17:0 MessageWriter - A (2)
+    M 13:4 MessageReader.get_turns - A (1)
+    M 19:4 MessageWriter.add_turn - A (1)
+    C 23:0 AbstractStorageAdapter - A (1)
+backend/database/write_queue.py
+    M 38:4 WriteQueue._run - B (6)
+    C 14:0 WriteQueue - A (3)
+    M 34:4 WriteQueue._ensure_worker - A (3)
+    M 26:4 WriteQueue.stop - A (2)
+    M 15:4 WriteQueue.__init__ - A (1)
+    M 19:4 WriteQueue.submit - A (1)
+backend/database/sqlite_adapter.py
+    M 51:4 SQLiteAdapter.get_instance - A (5)
+    C 25:0 SQLiteAdapter - A (3)
+    M 28:4 SQLiteAdapter.__init__ - A (3)
+    M 59:4 SQLiteAdapter.reset_instance - A (2)
+    M 74:4 SQLiteAdapter._run - A (2)
+    M 82:4 SQLiteAdapter._get_turns_sync - A (2)
+    M 93:4 SQLiteAdapter._add_turn_locked - A (2)
+    M 65:4 SQLiteAdapter.close - A (1)
+    M 68:4 SQLiteAdapter.get_turns - A (1)
+    M 71:4 SQLiteAdapter.add_turn - A (1)
+    M 89:4 SQLiteAdapter._add_turn_sync - A (1)
+backend/database/session_manager.py
+    C 12:0 Pruner - A (2)
+    C 16:0 SessionManager - A (2)
+    M 13:4 Pruner.prune - A (1)
+    M 17:4 SessionManager.__init__ - A (1)
+    M 21:4 SessionManager.add_turn - A (1)
+    M 25:4 SessionManager.get_pruned_context - A (1)
+backend/services/context_pruner.py
+    C 14:0 ContextPruner - A (4)
+    M 17:4 ContextPruner.__init__ - A (4)
+    M 28:4 ContextPruner.prune - A (3)
+    M 34:4 ContextPruner._total_tokens - A (2)
+    F 9:0 approximate_token_count - A (1)
+backend/services/llm_provider.py
+    C 10:0 AbstractLLMProvider - A (2)
+    M 12:4 AbstractLLMProvider.generate_response - A (1)
+backend/services/gemini_adapter.py
+    M 33:4 GeminiAdapter.generate_response - A (5)
+    C 19:0 GeminiAdapter - A (4)
+    M 57:4 GeminiAdapter._extract_text - A (4)
+    M 20:4 GeminiAdapter.__init__ - A (3)
+    M 53:4 GeminiAdapter.aclose - A (1)
+backend/services/prompt_factory.py
+    C 13:0 PromptFactory - B (6)
+    M 15:4 PromptFactory.build_sidekick_prompt - A (5)
+backend/services/models.py
+    C 9:0 Turn - B (8)
+    M 19:4 Turn.__post_init__ - B (7)
+backend/api/sync.py
+    F 13:0 sync - A (1)
+backend/api/query.py
+    F 18:0 query - A (2)
+backend/api/error_handlers.py
+    F 46:0 _validation_message - A (5)
+    F 55:0 register_error_handlers - A (2)
+    F 42:0 _error_response - A (1)
+backend/api/schemas.py
+    C 36:0 QueryRequest - A (3)
+    M 42:4 QueryRequest.text_must_not_be_blank - A (2)
+    C 16:0 _Strict - A (1)
+    C 20:0 TurnIn - A (1)
+    C 26:0 SyncRequest - A (1)
+    C 31:0 SyncResponse - A (1)
+    C 48:0 QueryResponse - A (1)
+backend/api/dependencies.py
+    F 8:0 get_session_manager - A (1)
+    F 12:0 get_provider - A (1)
+backend/api/health.py
+    F 7:0 health - A (1)
+
+77 blocks (classes, functions, methods) analyzed.
+Average complexity: A (2.324675324675325)
