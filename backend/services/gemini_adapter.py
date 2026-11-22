@@ -3,10 +3,9 @@
 All Google-specific shapes and errors stay in this file. Failures become our typed errors.
 The API key travels only in the x-goog-api-key header and is never logged or put in a message.
 """
+import asyncio
 import logging
-
 import httpx
-
 from errors import ProviderBadResponseError, ProviderRateLimitError, ProviderTimeoutError
 from services.llm_provider import AbstractLLMProvider
 
@@ -29,14 +28,20 @@ class GeminiAdapter(AbstractLLMProvider):
             raise ValueError("api_key must not be empty")
         self._api_key = api_key
         self._model = model
+        self._timeout_seconds = timeout_seconds
+        self._owns_client = client is None  # only close what we created
         self._client = client or httpx.AsyncClient(timeout=timeout_seconds)
 
     async def generate_response(self, prompt: str) -> str:
         url = f"{BASE_URL}/models/{self._model}:generateContent"
         body = {"contents": [{"role": "user", "parts": [{"text": prompt}]}]}
         try:
-            response = await self._client.post(url, json=body, headers={"x-goog-api-key": self._api_key})
-        except httpx.TimeoutException as exc:
+            # One total deadline for the whole call, whichever client is used.
+            async with asyncio.timeout(self._timeout_seconds):
+                response = await self._client.post(
+                    url, json=body, headers={"x-goog-api-key": self._api_key}, timeout=self._timeout_seconds
+                )
+        except (httpx.TimeoutException, TimeoutError) as exc:
             logger.warning("gemini request timed out")
             raise ProviderTimeoutError("the provider timed out") from exc
         except httpx.HTTPError as exc:
@@ -61,7 +66,8 @@ class GeminiAdapter(AbstractLLMProvider):
         return self._extract_text(response)
 
     async def aclose(self) -> None:
-        await self._client.aclose()
+        if self._owns_client:
+            await self._client.aclose()
 
     @staticmethod
     def _extract_text(response: httpx.Response) -> str:
