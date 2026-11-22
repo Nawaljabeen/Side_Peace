@@ -14,6 +14,7 @@ logger = logging.getLogger("sidepeace")
 
 BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
 DEFAULT_TIMEOUT_SECONDS = 20.0
+TIMEOUT_STATUSES = (408, 504)  # the provider (or a gateway in front of it) says the request took too long
 
 
 class GeminiAdapter(AbstractLLMProvider):
@@ -45,6 +46,9 @@ class GeminiAdapter(AbstractLLMProvider):
         if response.status_code == 429:
             logger.warning("gemini rate limit reached")
             raise ProviderRateLimitError("the provider rate limit was reached")
+        if response.status_code in TIMEOUT_STATUSES:
+            logger.warning("gemini returned status %s (timeout)", response.status_code)
+            raise ProviderTimeoutError("the provider timed out")
         if response.status_code >= 400:
             logger.warning("gemini returned status %s", response.status_code)
             raise ProviderBadResponseError("the provider rejected the request")
