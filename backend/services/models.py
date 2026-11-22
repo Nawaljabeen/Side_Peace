@@ -25,3 +25,5 @@ class Turn:
             raise ValueError(f"role must be one of {VALID_ROLES}")
         if not isinstance(self.text, str) or not 1 <= len(self.text) <= MAX_TURN_TEXT_LENGTH:
             raise ValueError(f"text must be a string of 1-{MAX_TURN_TEXT_LENGTH} characters")
+        if "\x00" in self.text:
+            raise ValueError("text must not contain a NUL character")

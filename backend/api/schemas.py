@@ -22,6 +22,13 @@ class TurnIn(_Strict):
     role: Literal["user", "model"]
     text: str = Field(min_length=1, max_length=MAX_TURN_TEXT_LENGTH)
 
+    @field_validator("text")
+    @classmethod
+    def text_must_not_contain_nul(cls, value: str) -> str:
+        if "\x00" in value:
+            raise ValueError("text must not contain a NUL character")
+        return value
+
 
 class SyncRequest(_Strict):
     session_id: str = Field(min_length=1, max_length=MAX_SESSION_ID_LENGTH, pattern=SESSION_ID_PATTERN)
