@@ -1,7 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { initSidePanel } from "../sidepanel/initSidePanel.js";
 
-const okHealth = () => vi.fn().mockResolvedValue({ ok: true, json: async () => ({ status: "ok" }) });
+// The panel only knows its bridge (sendQuery, checkHealth); it never sees a URL or fetch.
+const makeBridge = ({ healthy = true, answer = "an answer" } = {}) => ({
+  sendQuery: vi.fn().mockResolvedValue(answer),
+  checkHealth: vi.fn().mockResolvedValue(healthy),
+});
 
 function renderPage() {
   document.body.innerHTML = `
@@ -20,8 +24,8 @@ describe("initSidePanel form wiring (REQ-F04)", () => {
   beforeEach(renderPage);
 
   it("sends the typed question to the bridge on submit and prevents the page reload", async () => {
-    const bridge = { sendQuery: vi.fn().mockResolvedValue("an answer") };
-    const { ready } = initSidePanel({ document, bridge, backendUrl: "http://x", fetchFn: okHealth() });
+    const bridge = makeBridge();
+    const { ready } = initSidePanel({ document, bridge });
     await ready;
 
     document.getElementById("query").value = "what is a mutex?";
@@ -37,10 +41,9 @@ describe("initSidePanel form wiring (REQ-F04)", () => {
 
 describe("initSidePanel server status (REQ-F04, REQ-Q02)", () => {
   beforeEach(renderPage);
-  const bridge = { sendQuery: vi.fn() };
 
-  it("shows 'connected' when the backend is healthy", async () => {
-    const { ready } = initSidePanel({ document, bridge, backendUrl: "http://x", fetchFn: okHealth() });
+  it("shows 'connected' when the bridge reports a healthy backend", async () => {
+    const { ready } = initSidePanel({ document, bridge: makeBridge({ healthy: true }) });
     await ready;
     const status = document.getElementById("server-status");
     expect(status.textContent).toBe("Server: connected");
@@ -48,26 +51,25 @@ describe("initSidePanel server status (REQ-F04, REQ-Q02)", () => {
   });
 
   it("shows 'not running' when the backend cannot be reached", async () => {
-    const fetchFn = vi.fn().mockRejectedValue(new TypeError("Failed to fetch"));
-    const { ready } = initSidePanel({ document, bridge, backendUrl: "http://x", fetchFn });
+    const { ready } = initSidePanel({ document, bridge: makeBridge({ healthy: false }) });
     await ready;
     const status = document.getElementById("server-status");
     expect(status.textContent).toMatch(/not running/i);
     expect(status.dataset.state).toBe("down");
   });
 
-  it("asks the configured backend url for /health", async () => {
-    const fetchFn = okHealth();
-    const { ready } = initSidePanel({ document, bridge, backendUrl: "http://localhost:8000", fetchFn });
+  it("shows 'not running' instead of failing when the health check itself throws", async () => {
+    const bridge = makeBridge();
+    bridge.checkHealth.mockRejectedValue(new Error("no service worker"));
+    const { ready } = initSidePanel({ document, bridge });
     await ready;
-    expect(fetchFn).toHaveBeenCalledWith("http://localhost:8000/health");
+    expect(document.getElementById("server-status").dataset.state).toBe("down");
   });
 });
 
 describe("initSidePanel defensive checks (REQ-Q02)", () => {
   it("names the missing element instead of failing with a vague TypeError", () => {
     document.body.innerHTML = '<form id="query-form"></form>';
-    const bridge = { sendQuery: vi.fn() };
-    expect(() => initSidePanel({ document, bridge, backendUrl: "http://x", fetchFn: okHealth() })).toThrow(/#query/);
+    expect(() => initSidePanel({ document, bridge: makeBridge() })).toThrow(/#query/);
   });
 });
