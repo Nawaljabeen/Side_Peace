@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from services.models import MAX_TURN_TEXT_LENGTH
+from services.models import MAX_TURN_TEXT_LENGTH, MAX_TURN_INDEX
 from services.prompt_factory import MAX_QUESTION_LENGTH
 
 SESSION_ID_PATTERN = r"^[A-Za-z0-9_-]+$"
@@ -18,9 +18,16 @@ class _Strict(BaseModel):
 
 
 class TurnIn(_Strict):
-    index: int = Field(ge=0)
+    index: int = Field(ge=0, le=MAX_TURN_INDEX)
     role: Literal["user", "model"]
     text: str = Field(min_length=1, max_length=MAX_TURN_TEXT_LENGTH)
+
+    @field_validator("text")
+    @classmethod
+    def text_must_not_contain_nul(cls, value: str) -> str:
+        if "\x00" in value:
+            raise ValueError("text must not contain a NUL character")
+        return value
 
 
 class SyncRequest(_Strict):

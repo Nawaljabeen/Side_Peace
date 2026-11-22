@@ -1,0 +1,7 @@
+ Test Files  32 passed (32)
+      Tests  314 passed (314)
+=============================== Coverage summary ===============================
+Statements   : 97.9% ( 373/381 )
+Branches     : 96.08% ( 221/230 )
+Functions    : 96.87% ( 93/96 )
+Lines        : 97.82% ( 360/368 )
