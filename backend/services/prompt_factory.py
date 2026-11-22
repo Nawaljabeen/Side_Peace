@@ -4,8 +4,10 @@ from services.models import Turn
 MAX_QUESTION_LENGTH = 2000
 
 _TEMPLATE = (
-    "You are a side-kick assistant. Answer the side question below using the earlier "
-    "conversation only as background. Do not continue the main conversation.\n\n"
+    "You are a side-kick assistant. Answer the side question below directly. The earlier "
+    "conversation is context you may use when it helps; if the question is not about it, "
+    "answer from your general knowledge. Do not say the conversation lacks the answer and "
+    "do not continue the main conversation.\n\n"
     "Earlier conversation:\n{history}\n\nSide question: {question}"
 )
 
