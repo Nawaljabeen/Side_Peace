@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 860" width="1400" height="860" font-family="Segoe UI, Arial, sans-serif" font-size="14">
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#333"/></marker>
+<marker id="t" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="12" markerHeight="12" orient="auto"><path d="M1 1L11 6L1 11z" fill="#fff" stroke="#333" stroke-width="1.5"/></marker>
+<style>.b{fill:#fff;stroke:#333;stroke-width:1.5}.e{fill:#eef4ff;stroke:#2a4d8f;stroke-width:1.5}.n{fill:#fff6e5;stroke:#b36b00;stroke-width:1.5}.h{font-weight:700}.s{font-size:12px;fill:#555}.l{stroke:#333;stroke-width:1.5;fill:none}.d{stroke:#333;stroke-width:1.5;fill:none;stroke-dasharray:6 4}</style>
+</defs>
+<text x="700" y="26" text-anchor="middle" class="h" font-size="18">SidePeace class diagram (Milestone 2, after PR #53)</text>
+<text x="40" y="52" class="s">Blue = Chrome extension (JavaScript). White = FastAPI backend (Python). Orange = new or changed since Milestone 1.</text>
+
+<!-- extension -->
+<rect class="e" x="40" y="70" width="290" height="120"/><text x="52" y="92" class="h">SidePanelController</text><line x1="40" y1="100" x2="330" y2="100" stroke="#2a4d8f"/>
+<text x="52" y="120">-bridge (injected)  -latestRequestId</text><text x="52" y="142">+handleUserSubmit(text)</text><text x="52" y="164" class="s">textContent only; clears old answer</text>
+<rect class="e" x="410" y="70" width="290" height="120"/><text x="422" y="92" class="h">RuntimeBridge (createRuntimeBridge)</text><line x1="410" y1="100" x2="700" y2="100" stroke="#2a4d8f"/>
+<text x="422" y="122">+sendQuery(text): string</text><text x="422" y="144">+checkHealth(): boolean</text><text x="422" y="166" class="s">uses chrome.runtime.sendMessage</text>
+<rect class="e" x="780" y="70" width="330" height="140"/><text x="792" y="92" class="h">ExtensionBridge (service worker)</text><line x1="780" y1="100" x2="1110" y2="100" stroke="#2a4d8f"/>
+<text x="792" y="122">+syncTurn(sessionId, turn)  (retried)</text><text x="792" y="144">+sendQuery(sessionId, text)</text><text x="792" y="166">+checkHealth()</text><text x="792" y="190" class="s">the only code that calls the backend</text>
+<line class="l" x1="330" y1="130" x2="408" y2="130" marker-end="url(#a)"/><line class="l" x1="700" y1="130" x2="778" y2="130" marker-end="url(#a)"/>
+<text x="334" y="122" class="s">uses</text><text x="704" y="122" class="s">message</text>
+<line class="l" x1="945" y1="210" x2="945" y2="262" marker-end="url(#a)"/><text x="955" y="240" class="s">HTTP /sync /query /health</text>
+
+<!-- backend api -->
+<rect class="b" x="780" y="264" width="330" height="70"/><text x="792" y="286" class="h">FastAPI routes: sync, query, health</text><text x="792" y="308" class="s">validate (schemas) and map errors (error_handlers)</text>
+<line class="l" x1="780" y1="300" x2="600" y2="380" marker-end="url(#a)"/>
+
+<!-- core -->
+<rect class="b" x="330" y="380" width="290" height="100"/><text x="342" y="402" class="h">SessionManager</text><line x1="330" y1="410" x2="620" y2="410" stroke="#333"/>
+<text x="342" y="432">+add_turn(session_id, turn)</text><text x="342" y="454">+get_pruned_context(session_id)</text>
+<rect class="b" x="330" y="540" width="290" height="80"/><text x="342" y="562" class="h">ContextPruner</text><line x1="330" y1="570" x2="620" y2="570" stroke="#333"/><text x="342" y="592">+prune(turns): turns (newest first kept)</text>
+<line class="d" x1="475" y1="480" x2="475" y2="538" marker-end="url(#a)"/><text x="485" y="515" class="s">Pruner (Protocol)</text>
+<rect class="n" x="40" y="380" width="250" height="90"/><text x="52" y="402" class="h">PromptFactory</text><line x1="40" y1="410" x2="290" y2="410" stroke="#b36b00"/><text x="52" y="432">+build_sidekick_prompt(</text><text x="52" y="452">   context, question): string</text>
+<line class="l" x1="780" y1="325" x2="292" y2="420" marker-end="url(#a)"/>
+<rect class="b" x="40" y="520" width="250" height="40" /><text x="52" y="545" class="h">Turn(index, role, text)</text>
+
+<!-- llm -->
+<rect class="b" x="1000" y="380" width="360" height="70"/><text x="1012" y="402" class="h">«abstract» AbstractLLMProvider</text><text x="1012" y="432">+generate_response(prompt): string</text>
+<rect class="b" x="1000" y="520" width="360" height="100"/><text x="1012" y="542" class="h">GeminiAdapter</text><line x1="1000" y1="550" x2="1360" y2="550" stroke="#333"/><text x="1012" y="572">+generate_response(prompt)   +aclose()</text><text x="1012" y="594" class="s">maps provider failures to typed errors</text>
+<line class="l" x1="1180" y1="520" x2="1180" y2="452" marker-end="url(#t)"/>
+<line class="l" x1="1110" y1="300" x2="1180" y2="378" marker-end="url(#a)"/>
+
+<!-- storage -->
+<rect class="b" x="40" y="680" width="300" height="110"/><text x="52" y="702" class="h">«abstract» AbstractStorageAdapter</text><line x1="40" y1="710" x2="340" y2="710" stroke="#333"/><text x="52" y="732">MessageReader.get_turns(session_id)</text><text x="52" y="754">MessageWriter.add_turn(session_id, turn)</text><text x="52" y="776" class="s">split by interface (ISP)</text>
+<rect class="b" x="400" y="720" width="250" height="60"/><text x="412" y="742" class="h">InMemoryAdapter</text><text x="412" y="764" class="s">used by tests</text>
+<rect class="n" x="720" y="660" width="330" height="150"/><text x="732" y="682" class="h">SQLiteAdapter  (Singleton)</text><line x1="720" y1="690" x2="1050" y2="690" stroke="#b36b00"/>
+<text x="732" y="712">-_conn_lock   -_instance</text><text x="732" y="734">+get_instance(db_path)  +reset_instance()</text><text x="732" y="756">+get_turns()  +add_turn()  +close()</text><text x="732" y="780" class="s">all writes go through WriteQueue</text>
+<rect class="n" x="1100" y="680" width="260" height="90"/><text x="1112" y="702" class="h">WriteQueue</text><line x1="1100" y1="710" x2="1360" y2="710" stroke="#b36b00"/><text x="1112" y="732">+submit(job)   +stop()</text><text x="1112" y="754" class="s">one writer at a time</text>
+<line class="l" x1="720" y1="700" x2="342" y2="700" marker-end="url(#t)"/>
+<line class="l" x1="400" y1="750" x2="342" y2="750" marker-end="url(#t)"/>
+<line class="l" x1="1050" y1="725" x2="1098" y2="725" marker-end="url(#a)"/><text x="1052" y="716" class="s">owns</text>
+<line class="l" x1="330" y1="450" x2="190" y2="690" stroke-dasharray="6 4" marker-end="url(#a)"/><text x="205" y="640" class="s">reads / writes turns</text>
+<text x="700" y="850" text-anchor="middle" class="s">Hollow triangle = inherits / implements. Dashed = depends on an interface. Solid arrow = calls.</text>
+</svg>

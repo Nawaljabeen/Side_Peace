@@ -1,4 +1,4 @@
-# Fagan inspection: meeting kit (Moderator: Ammar)
+# Fagan inspection: meeting kit (planning draft; the meeting was run by Moderator Nawal, Ammar was Reader)
 
 Frozen SHA `e0192a5`; scope and roles in `fagan-checklist.md`. Date and outside inspector: _TBD_ (record them in the planning table when booked).
 

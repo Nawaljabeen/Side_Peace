@@ -13,7 +13,7 @@ const BRIDGE = "background/extensionBridge.js";
 // The side panel's start-up health check still calls fetch itself. It moves to the bridge when the panel is
 // switched to the real bridge (Card 2C follow-up); remove these entries then. The last test below fails
 // if an entry stays on this list after its file has stopped using fetch.
-const KNOWN_EXCEPTIONS = ["sidepanel/serverStatus.js", "sidepanel/sidepanel.js"];
+const KNOWN_EXCEPTIONS = [];
 
 function sourceFiles(folder) {
   return readdirSync(join(root, folder)).flatMap((name) => {

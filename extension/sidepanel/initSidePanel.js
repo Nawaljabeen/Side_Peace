@@ -1,5 +1,4 @@
 import { SidePanelController } from "./sidePanelController.js";
-import { checkServer } from "./serverStatus.js";
 
 function requireElement(document, id) {
   const element = document.getElementById(id);
@@ -9,7 +8,12 @@ function requireElement(document, id) {
   return element;
 }
 
-export function initSidePanel({ document, bridge, backendUrl, fetchFn }) {
+/**
+ * @param {object} deps
+ * @param {Document} deps.document
+ * @param {{sendQuery: (text: string) => Promise<string>, checkHealth: () => Promise<boolean>}} deps.bridge
+ */
+export function initSidePanel({ document, bridge }) {
   const controller = new SidePanelController(bridge, {
     input: requireElement(document, "query"),
     submitButton: requireElement(document, "submit"),
@@ -22,9 +26,12 @@ export function initSidePanel({ document, bridge, backendUrl, fetchFn }) {
   });
 
   const serverStatus = requireElement(document, "server-status");
-  const ready = checkServer(backendUrl, fetchFn).then((isUp) => {
-    serverStatus.dataset.state = isUp ? "up" : "down";
-    serverStatus.textContent = isUp ? "Server: connected" : "Server: not running (demo answers only)";
-  });
+  const ready = Promise.resolve()
+    .then(() => bridge.checkHealth())
+    .catch(() => false)
+    .then((isUp) => {
+      serverStatus.dataset.state = isUp ? "up" : "down";
+      serverStatus.textContent = isUp ? "Server: connected" : "Server: not running (answers need the backend)";
+    });
   return { controller, ready };
 }
