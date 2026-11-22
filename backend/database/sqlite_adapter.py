@@ -92,6 +92,7 @@ class SQLiteAdapter(AbstractStorageAdapter):
 
     def _add_turn_locked(self, session_id: str, turn: Turn) -> int:
         self._conn.execute("BEGIN IMMEDIATE")
+        committed = False
         try:
             self._conn.execute("INSERT OR IGNORE INTO sessions(session_id) VALUES (?)", (session_id,))
             self._conn.execute(
@@ -103,7 +104,16 @@ class SQLiteAdapter(AbstractStorageAdapter):
                 "SELECT COUNT(*) FROM turns WHERE session_id = ?", (session_id,)
             ).fetchone()
             self._conn.execute("COMMIT")
-        except sqlite3.Error:
-            self._conn.execute("ROLLBACK")
-            raise
+            committed = True
+        finally:
+            # Whatever went wrong (a SQLite error or not), never leave the shared connection inside a transaction.
+            if not committed:
+                self._rollback_quietly()
         return count
+
+    def _rollback_quietly(self) -> None:
+        """Roll back; if even that fails, log it and let the original error reach the caller."""
+        try:
+            self._conn.execute("ROLLBACK")
+        except sqlite3.Error as exc:
+            logger.error("rollback failed: %s", exc)
