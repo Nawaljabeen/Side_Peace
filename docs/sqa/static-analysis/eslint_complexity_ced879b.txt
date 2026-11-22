@@ -1,0 +1,6 @@
+
+/tmp/cur/extension/background/extensionBridge.js
+  33:3  warning  Constructor has a complexity of 15. Maximum allowed is 10  complexity
+
+✖ 1 problem (0 errors, 1 warning)
+
