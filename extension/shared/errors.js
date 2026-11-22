@@ -33,3 +33,29 @@ export class ServerError extends BridgeError {
     this.code = code;
   }
 }
+
+const BY_NAME = { NetworkError, ValidationError, ServerError };
+const UNKNOWN_MESSAGE = "Something went wrong.";
+
+/** Typed error -> plain object, because chrome.runtime messages can only carry JSON. */
+export function toErrorPayload(error) {
+  if (error instanceof NetworkError) {
+    return { name: error.name, message: error.message, timedOut: error.timedOut };
+  }
+  if (error instanceof ValidationError) {
+    return { name: error.name, message: error.message, code: error.code };
+  }
+  if (error instanceof ServerError) {
+    return { name: error.name, message: error.message, status: error.status, code: error.code };
+  }
+  // Anything else is a bug on our side: its message may hold paths or values, so it is never shown to the user.
+  return { name: "ServerError", message: "Something went wrong. Please try again.", status: 500, code: "internal_error" };
+}
+
+/** Plain object -> the matching typed error (an unknown name becomes a ServerError). */
+export function fromErrorPayload(payload) {
+  const ErrorClass = BY_NAME[payload?.name] ?? ServerError;
+  const message = typeof payload?.message === "string" ? payload.message : UNKNOWN_MESSAGE;
+  const fields = payload !== null && typeof payload === "object" ? payload : {};
+  return new ErrorClass(message, fields);
+}

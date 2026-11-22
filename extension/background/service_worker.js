@@ -1,4 +1,5 @@
+// Entry point of the service worker (manifest.json). Chrome runs this file every time it starts the worker, so
+// the setup must happen here, at the top level, at once (R-05). All logic lives in serviceWorkerSetup.js.
+import { setupServiceWorker } from "./serviceWorkerSetup.js";
 
-chrome.sidePanel
-  .setPanelBehavior({ openPanelOnActionClick: true })
-  .catch((error) => console.error("SidePeace: could not set side panel behaviour", error));
+setupServiceWorker(chrome);
