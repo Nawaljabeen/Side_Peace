@@ -1,0 +1,105 @@
+************* Module errors
+errors.py:28:0: C0304: Final newline missing (missing-final-newline)
+************* Module main
+main.py:57:0: C0304: Final newline missing (missing-final-newline)
+main.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+main.py:26:0: C0116: Missing function or method docstring (missing-function-docstring)
+main.py:39:19: W0718: Catching too general exception Exception (broad-exception-caught)
+main.py:34:23: W0613: Unused argument 'app' (unused-argument)
+************* Module server
+server.py:52:0: C0304: Final newline missing (missing-final-newline)
+server.py:25:0: C0116: Missing function or method docstring (missing-function-docstring)
+server.py:36:0: C0116: Missing function or method docstring (missing-function-docstring)
+************* Module settings
+settings.py:60:0: C0301: Line too long (102/100) (line-too-long)
+settings.py:67:0: C0301: Line too long (106/100) (line-too-long)
+settings.py:75:0: C0304: Final newline missing (missing-final-newline)
+settings.py:20:0: C0115: Missing class docstring (missing-class-docstring)
+************* Module api.sync
+api/sync.py:13:0: C0301: Line too long (107/100) (line-too-long)
+api/sync.py:16:0: C0304: Final newline missing (missing-final-newline)
+api/sync.py:13:0: C0116: Missing function or method docstring (missing-function-docstring)
+************* Module api.query
+api/query.py:1:0: C0301: Line too long (105/100) (line-too-long)
+api/query.py:30:0: C0304: Final newline missing (missing-final-newline)
+api/query.py:18:0: C0116: Missing function or method docstring (missing-function-docstring)
+************* Module api.error_handlers
+api/error_handlers.py:25:0: C0301: Line too long (103/100) (line-too-long)
+api/error_handlers.py:26:0: C0301: Line too long (114/100) (line-too-long)
+api/error_handlers.py:63:0: C0301: Line too long (110/100) (line-too-long)
+api/error_handlers.py:80:0: C0304: Final newline missing (missing-final-newline)
+api/error_handlers.py:55:0: C0116: Missing function or method docstring (missing-function-docstring)
+api/error_handlers.py:62:28: W0613: Unused argument 'request' (unused-argument)
+************* Module api.schemas
+api/schemas.py:27:0: C0301: Line too long (103/100) (line-too-long)
+api/schemas.py:37:0: C0301: Line too long (103/100) (line-too-long)
+api/schemas.py:49:0: C0304: Final newline missing (missing-final-newline)
+api/schemas.py:20:0: C0115: Missing class docstring (missing-class-docstring)
+api/schemas.py:26:0: C0115: Missing class docstring (missing-class-docstring)
+api/schemas.py:31:0: C0115: Missing class docstring (missing-class-docstring)
+api/schemas.py:36:0: C0115: Missing class docstring (missing-class-docstring)
+api/schemas.py:42:4: C0116: Missing function or method docstring (missing-function-docstring)
+api/schemas.py:48:0: C0115: Missing class docstring (missing-class-docstring)
+************* Module api.dependencies
+api/dependencies.py:13:0: C0304: Final newline missing (missing-final-newline)
+api/dependencies.py:8:0: C0116: Missing function or method docstring (missing-function-docstring)
+api/dependencies.py:12:0: C0116: Missing function or method docstring (missing-function-docstring)
+************* Module api.health
+api/health.py:8:0: C0304: Final newline missing (missing-final-newline)
+api/health.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+api/health.py:7:0: C0116: Missing function or method docstring (missing-function-docstring)
+************* Module database.memory_adapter
+database/memory_adapter.py:7:0: C0301: Line too long (102/100) (line-too-long)
+database/memory_adapter.py:19:0: C0304: Final newline missing (missing-final-newline)
+************* Module database.base
+database/base.py:24:0: C0304: Final newline missing (missing-final-newline)
+database/base.py:11:0: C0115: Missing class docstring (missing-class-docstring)
+database/base.py:11:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+database/base.py:17:0: C0115: Missing class docstring (missing-class-docstring)
+database/base.py:17:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+database/base.py:23:0: W0223: Method 'add_turn' is abstract in class 'MessageWriter' but is not overridden in child class 'AbstractStorageAdapter' (abstract-method)
+database/base.py:23:0: W0223: Method 'get_turns' is abstract in class 'MessageReader' but is not overridden in child class 'AbstractStorageAdapter' (abstract-method)
+************* Module database.write_queue
+database/write_queue.py:43:0: C0301: Line too long (113/100) (line-too-long)
+database/write_queue.py:50:0: C0304: Final newline missing (missing-final-newline)
+database/write_queue.py:14:0: C0115: Missing class docstring (missing-class-docstring)
+database/write_queue.py:43:19: W0718: Catching too general exception Exception (broad-exception-caught)
+************* Module database.sqlite_adapter
+database/sqlite_adapter.py:33:0: C0301: Line too long (109/100) (line-too-long)
+database/sqlite_adapter.py:45:0: C0301: Line too long (105/100) (line-too-long)
+database/sqlite_adapter.py:96:0: C0301: Line too long (102/100) (line-too-long)
+database/sqlite_adapter.py:99:0: C0301: Line too long (104/100) (line-too-long)
+database/sqlite_adapter.py:109:0: C0304: Final newline missing (missing-final-newline)
+database/sqlite_adapter.py:25:0: C0115: Missing class docstring (missing-class-docstring)
+database/sqlite_adapter.py:51:4: C0116: Missing function or method docstring (missing-function-docstring)
+database/sqlite_adapter.py:54:48: W0212: Access to a protected member _db_path of a client class (protected-access)
+database/sqlite_adapter.py:65:4: C0116: Missing function or method docstring (missing-function-docstring)
+************* Module database.session_manager
+database/session_manager.py:28:0: C0304: Final newline missing (missing-final-newline)
+database/session_manager.py:12:0: C0115: Missing class docstring (missing-class-docstring)
+database/session_manager.py:13:4: C0116: Missing function or method docstring (missing-function-docstring)
+database/session_manager.py:12:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+database/session_manager.py:16:0: C0115: Missing class docstring (missing-class-docstring)
+************* Module services.context_pruner
+services/context_pruner.py:28:4: C0116: Missing function or method docstring (missing-function-docstring)
+services/context_pruner.py:14:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+************* Module services.llm_provider
+services/llm_provider.py:1:0: C0301: Line too long (105/100) (line-too-long)
+services/llm_provider.py:13:0: C0304: Final newline missing (missing-final-newline)
+services/llm_provider.py:10:0: C0115: Missing class docstring (missing-class-docstring)
+services/llm_provider.py:10:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+************* Module services.gemini_adapter
+services/gemini_adapter.py:37:0: C0301: Line too long (105/100) (line-too-long)
+services/gemini_adapter.py:65:0: C0304: Final newline missing (missing-final-newline)
+services/gemini_adapter.py:19:0: C0115: Missing class docstring (missing-class-docstring)
+services/gemini_adapter.py:53:4: C0116: Missing function or method docstring (missing-function-docstring)
+************* Module services.prompt_factory
+services/prompt_factory.py:13:0: C0115: Missing class docstring (missing-class-docstring)
+services/prompt_factory.py:15:4: C0116: Missing function or method docstring (missing-function-docstring)
+services/prompt_factory.py:13:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+************* Module services.models
+services/models.py:26:0: C0304: Final newline missing (missing-final-newline)
+
+------------------------------------------------------------------
+Your code has been rated at 8.21/10 (previous run: 8.21/10, +0.00)
+
