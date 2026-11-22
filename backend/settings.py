@@ -4,6 +4,7 @@ The Gemini API key is only ever read here. It is hidden from repr() so it cannot
 logs or tracebacks by accident, and the errors in this file never contain a value.
 """
 import os
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -57,6 +58,7 @@ def _positive_int(values: Mapping[str, str], name: str, default: int) -> int:
     return int(raw)
 
 
+_MODEL_NAME = re.compile(r"^[A-Za-z0-9._-]+$")
 def load_settings(environ: Mapping[str, str] | None = None, env_file: Path | None = None) -> Settings:
     """Build Settings. Real environment variables win over the .env file."""
     values = dict(load_env_file(env_file)) if env_file is not None else {}
@@ -66,9 +68,13 @@ def load_settings(environ: Mapping[str, str] | None = None, env_file: Path | Non
     if not api_key:
         raise ConfigError("GEMINI_API_KEY is not set. Put it in backend/.env (see backend/.env.example).")
 
+    model = values.get("GEMINI_MODEL", "").strip() or DEFAULT_GEMINI_MODEL
+    if not _MODEL_NAME.fullmatch(model):
+        raise ConfigError("GEMINI_MODEL must be a plain model name such as gemini-3.5-flash-lite (no slash or spaces)")
+
     return Settings(
         gemini_api_key=api_key,
-        gemini_model=values.get("GEMINI_MODEL", "").strip() or DEFAULT_GEMINI_MODEL,
+        gemini_model=model,
         db_path=values.get("SIDEPEACE_DB_PATH", "").strip() or DEFAULT_DB_PATH,
         max_context_turns=_positive_int(values, "MAX_CONTEXT_TURNS", DEFAULT_MAX_CONTEXT_TURNS),
         max_context_tokens=_positive_int(values, "MAX_CONTEXT_TOKENS", DEFAULT_MAX_CONTEXT_TOKENS),

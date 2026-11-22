@@ -1,0 +1,18 @@
+backend/api/dependencies.py:2:1: I001 [*] Import block is un-sorted or un-formatted
+backend/api/error_handlers.py:6:1: I001 [*] Import block is un-sorted or un-formatted
+backend/api/query.py:5:1: I001 [*] Import block is un-sorted or un-formatted
+backend/api/query.py:21:32: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+backend/api/query.py:22:37: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+backend/api/schemas.py:5:1: I001 [*] Import block is un-sorted or un-formatted
+backend/api/sync.py:2:1: I001 [*] Import block is un-sorted or un-formatted
+backend/api/sync.py:13:62: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+backend/database/memory_adapter.py:2:1: I001 [*] Import block is un-sorted or un-formatted
+backend/database/session_manager.py:6:1: I001 [*] Import block is un-sorted or un-formatted
+backend/database/sqlite_adapter.py:8:1: I001 [*] Import block is un-sorted or un-formatted
+backend/database/write_queue.py:43:20: BLE001 Do not catch blind exception: `Exception`
+backend/main.py:1:1: I001 [*] Import block is un-sorted or un-formatted
+backend/main.py:39:20: BLE001 Do not catch blind exception: `Exception`
+backend/server.py:5:1: I001 [*] Import block is un-sorted or un-formatted
+backend/services/gemini_adapter.py:6:1: I001 [*] Import block is un-sorted or un-formatted
+Found 16 errors.
+[*] 11 fixable with the `--fix` option.
