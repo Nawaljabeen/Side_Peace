@@ -1,4 +1,6 @@
-# Fagan Inspection Checklist (SE431, moderator: Muhammad Ammar Zahid)
+# Fagan Inspection Checklist (SE431)
+
+> **Actual outcome (team report, 2026-11-22):** held at frozen `e0192a5`. Moderator Nawal, Author Nazaar, **Reader Ammar**, Recorder Mahvash, outside inspectors Bareera and Zouhair; 25 entries D-01..D-25, 3 Major. The role table below is the earlier planning record and was superseded by this.
 
 Artifact: Nazaar's Storage + Gateway code, frozen at a recorded commit SHA (fill in at planning).
 Roles: Moderator = Ammar, Author = Nazaar, Reader/Recorder = Nawal, plus one inspector from another team.

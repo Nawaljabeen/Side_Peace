@@ -40,3 +40,10 @@ def test_prompt_marks_side_question_as_isolated_and_has_no_secrets():
     assert "side question" in prompt.lower()
     for forbidden in ("api_key", "apikey", "secret", "password", "token="):
         assert forbidden not in prompt.lower()
+
+
+def test_prompt_lets_the_model_use_general_knowledge_when_the_chat_has_no_answer():
+    # CAPA-04: with the real Gemini the old wording made it refuse ("there is no mention of ... in the conversation").
+    prompt = PromptFactory.build_sidekick_prompt([], "What is a semaphore?").lower()
+    assert "general knowledge" in prompt
+    assert "only as background" not in prompt
