@@ -49,6 +49,12 @@ class GeminiAdapter(AbstractLLMProvider):
         if response.status_code in TIMEOUT_STATUSES:
             logger.warning("gemini returned status %s (timeout)", response.status_code)
             raise ProviderTimeoutError("the provider timed out")
+        if response.status_code in (401, 403):
+            logger.error("gemini rejected the credentials (status %s): check GEMINI_API_KEY", response.status_code)
+            raise ProviderBadResponseError("the provider rejected the request")
+        if response.status_code == 404:
+            logger.error("gemini does not know the model (status 404): check GEMINI_MODEL")
+            raise ProviderBadResponseError("the provider rejected the request")
         if response.status_code >= 400:
             logger.warning("gemini returned status %s", response.status_code)
             raise ProviderBadResponseError("the provider rejected the request")
